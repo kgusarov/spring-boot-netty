@@ -1,0 +1,12 @@
+netty:
+  servers:
+    - name: server1
+      host: localhost
+      port: 40000
+      bossThreads: 4
+      workerThreads: 4
+      options:
+        tcpNodelay: true
+        soReuseAddr: true
+      childOptions:
+        tcpNodelay: true
