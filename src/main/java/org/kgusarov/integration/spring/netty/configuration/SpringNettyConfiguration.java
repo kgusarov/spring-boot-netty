@@ -143,7 +143,7 @@ public class SpringNettyConfiguration {
     private void addDisconnectHandlers(final String serverName, final TcpServer server,
                                        final Map<String, Object> disconnectHandlers) {
 
-        checkTcpEventHandlersArePresent(disconnectHandlers, OnDisconnect.class, (ignored) -> Void.class);
+        checkTcpEventHandlersArePresent(disconnectHandlers, OnDisconnect.class, ignored -> Void.class);
 
         final List<Supplier<TcpEventHandler>> underlying = createUnderlyingHandlerList(
                 serverName, disconnectHandlers, OnDisconnect.class, OnDisconnect::priority, OnDisconnect::serverName);
@@ -163,7 +163,7 @@ public class SpringNettyConfiguration {
     private void addConnectHandlers(final String serverName, final TcpServer server,
                                     final Map<String, Object> connectHandlers) {
 
-        checkTcpEventHandlersArePresent(connectHandlers, OnConnect.class, (ignored) -> Void.class);
+        checkTcpEventHandlersArePresent(connectHandlers, OnConnect.class, ignored -> Void.class);
 
         final List<Supplier<TcpEventHandler>> underlying = createUnderlyingHandlerList(
                 serverName, connectHandlers, OnConnect.class, OnConnect::priority, OnConnect::serverName);

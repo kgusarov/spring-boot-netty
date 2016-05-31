@@ -15,94 +15,94 @@ import java.util.function.Supplier;
  * A typesafe configuration for {@code io.netty.channel.ChannelOption} options
  */
 public final class ChannelOptions implements Supplier<Map<ChannelOption, Object>> {
-    private final Map<ChannelOption, Object> channelOptions = Maps.newHashMap();
+    private final Map<ChannelOption, Object> options = Maps.newHashMap();
 
     public void setAllocator(final ByteBufAllocator allocator) {
-        channelOptions.put(ChannelOption.ALLOCATOR, allocator);
+        options.put(ChannelOption.ALLOCATOR, allocator);
     }
 
     public void setRecvBufAllocator(final RecvByteBufAllocator allocator) {
-        channelOptions.put(ChannelOption.RCVBUF_ALLOCATOR, allocator);
+        options.put(ChannelOption.RCVBUF_ALLOCATOR, allocator);
     }
 
     public void setConnectTimeout(final int milliseconds) {
-        channelOptions.put(ChannelOption.CONNECT_TIMEOUT_MILLIS, milliseconds);
+        options.put(ChannelOption.CONNECT_TIMEOUT_MILLIS, milliseconds);
     }
 
     public void setWriteSpinCount(final int count) {
-        channelOptions.put(ChannelOption.WRITE_SPIN_COUNT, count);
+        options.put(ChannelOption.WRITE_SPIN_COUNT, count);
     }
 
     public void setWriteBufferWaterMark(final WriteBufferWaterMark mark) {
-        channelOptions.put(ChannelOption.WRITE_BUFFER_WATER_MARK, mark);
+        options.put(ChannelOption.WRITE_BUFFER_WATER_MARK, mark);
     }
 
     public void setAllowHalfClosure(final boolean allow) {
-        channelOptions.put(ChannelOption.ALLOW_HALF_CLOSURE, allow);
+        options.put(ChannelOption.ALLOW_HALF_CLOSURE, allow);
     }
 
     public void setAutoRead(final boolean autoRead) {
-        channelOptions.put(ChannelOption.AUTO_READ, autoRead);
+        options.put(ChannelOption.AUTO_READ, autoRead);
     }
 
     public void setSoBroadcast(final boolean broadcast) {
-        channelOptions.put(ChannelOption.SO_BROADCAST, broadcast);
+        options.put(ChannelOption.SO_BROADCAST, broadcast);
     }
 
     public void setSoKeepAlive(final boolean keepAlive) {
-        channelOptions.put(ChannelOption.SO_KEEPALIVE, keepAlive);
+        options.put(ChannelOption.SO_KEEPALIVE, keepAlive);
     }
 
     public void setSoSndBuf(final int buf) {
-        channelOptions.put(ChannelOption.SO_SNDBUF, buf);
+        options.put(ChannelOption.SO_SNDBUF, buf);
     }
 
     public void setSoRcvBuf(final int buf) {
-        channelOptions.put(ChannelOption.SO_RCVBUF, buf);
+        options.put(ChannelOption.SO_RCVBUF, buf);
     }
 
     public void setSoReuseAddr(final boolean reuseAddr) {
-        channelOptions.put(ChannelOption.SO_REUSEADDR, reuseAddr);
+        options.put(ChannelOption.SO_REUSEADDR, reuseAddr);
     }
 
     public void setSoLinger(final int linger) {
-        channelOptions.put(ChannelOption.SO_LINGER, linger);
+        options.put(ChannelOption.SO_LINGER, linger);
     }
 
     public void setSoBacklog(final int backlog) {
-        channelOptions.put(ChannelOption.SO_BACKLOG, backlog);
+        options.put(ChannelOption.SO_BACKLOG, backlog);
     }
 
     public void setSoTimeout(final int timeout) {
-        channelOptions.put(ChannelOption.SO_TIMEOUT, timeout);
+        options.put(ChannelOption.SO_TIMEOUT, timeout);
     }
 
     public void setIpTos(final int tos) {
-        channelOptions.put(ChannelOption.IP_TOS, tos);
+        options.put(ChannelOption.IP_TOS, tos);
     }
 
     public void setIpMulticastAddr(final InetAddress addr) {
-        channelOptions.put(ChannelOption.IP_MULTICAST_ADDR, addr);
+        options.put(ChannelOption.IP_MULTICAST_ADDR, addr);
     }
 
     public void setIpMulticastIf(final NetworkInterface iface) {
-        channelOptions.put(ChannelOption.IP_MULTICAST_IF, iface);
+        options.put(ChannelOption.IP_MULTICAST_IF, iface);
     }
 
     public void setIpMulticastTtl(final int ttl) {
-        channelOptions.put(ChannelOption.IP_MULTICAST_TTL, ttl);
+        options.put(ChannelOption.IP_MULTICAST_TTL, ttl);
     }
 
     public void setIpMulticastLoopDisabled(final boolean loopDisabled) {
-        channelOptions.put(ChannelOption.IP_MULTICAST_LOOP_DISABLED, loopDisabled);
+        options.put(ChannelOption.IP_MULTICAST_LOOP_DISABLED, loopDisabled);
     }
 
     public void setTcpNodelay(final boolean noDelay) {
-        channelOptions.put(ChannelOption.TCP_NODELAY, noDelay);
+        options.put(ChannelOption.TCP_NODELAY, noDelay);
     }
 
     @Override
     public Map<ChannelOption, Object> get() {
-        return channelOptions;
+        return options;
     }
 }

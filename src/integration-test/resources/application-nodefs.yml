@@ -1,0 +1,5 @@
+netty:
+  servers:
+    - name: server1
+      host: localhost
+      port: 40000

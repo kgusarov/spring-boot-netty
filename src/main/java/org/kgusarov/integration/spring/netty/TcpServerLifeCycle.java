@@ -2,6 +2,7 @@ package org.kgusarov.integration.spring.netty;
 
 import com.google.common.util.concurrent.Futures;
 import org.kgusarov.integration.spring.netty.configuration.NettyServers;
+import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
@@ -24,10 +25,14 @@ public final class TcpServerLifeCycle {
      * Start all servers
      */
     @PostConstruct
-    public void start() throws ExecutionException, InterruptedException {
-        Futures.allAsList(nettyServers.stream()
-                .map(TcpServer::start)
-                .collect(Collectors.toList())).get();
+    public void start() {
+        try {
+            Futures.allAsList(nettyServers.stream()
+                    .map(TcpServer::start)
+                    .collect(Collectors.toList())).get();
+        } catch (final InterruptedException | ExecutionException e) {
+            throw new BeanInitializationException("Failed to start NETTY servers", e);
+        }
     }
 
     /**
