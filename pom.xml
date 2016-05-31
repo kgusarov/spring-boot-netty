@@ -4,7 +4,7 @@
 
     <groupId>org.kgusarov</groupId>
     <artifactId>spring-boot-netty</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
 
     <properties>
         <!-- File encodings -->
@@ -33,7 +33,7 @@
     <scm>
         <connection>scm:git:https://github.com/kgusarov/spring-boot-netty.git</connection>
         <developerConnection>scm:git:https://github.com/kgusarov/spring-boot-netty.git</developerConnection>
-        <tag>spring-boot-netty-1.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
