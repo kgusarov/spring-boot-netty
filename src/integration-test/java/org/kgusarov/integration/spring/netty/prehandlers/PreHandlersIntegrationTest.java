@@ -24,10 +24,9 @@ import static io.netty.buffer.Unpooled.copyLong;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @ActiveProfiles("prehandlers")
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+@SpringBootTest
 @ContextConfiguration(classes = {
         PreHandlersApplication.class,
         HandlerCallStack.class

@@ -22,10 +22,9 @@ import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @ActiveProfiles("ondisconnect")
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+@SpringBootTest
 @ContextConfiguration(classes = {
         OnDisconnectApplication.class,
         HandlerCallStack.class,

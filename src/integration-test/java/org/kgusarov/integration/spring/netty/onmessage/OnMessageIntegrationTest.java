@@ -25,10 +25,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @ActiveProfiles("onmessage")
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+@SpringBootTest
 @ContextConfiguration(classes = OnMessageApplication.class, loader = SpringBootContextLoader.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class OnMessageIntegrationTest {

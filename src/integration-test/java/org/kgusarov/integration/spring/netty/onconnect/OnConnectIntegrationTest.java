@@ -22,10 +22,9 @@ import java.util.concurrent.TimeUnit;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @ActiveProfiles("onconnect")
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+@SpringBootTest
 @ContextConfiguration(classes = {
         OnConnectApplication.class,
         HandlerCallStack.class,

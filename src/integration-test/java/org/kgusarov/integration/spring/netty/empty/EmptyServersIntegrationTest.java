@@ -11,9 +11,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+@SpringBootTest
 @ContextConfiguration(classes = EmptyApplication.class, loader = SpringBootContextLoader.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class EmptyServersIntegrationTest {
