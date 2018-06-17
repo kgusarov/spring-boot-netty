@@ -11,8 +11,8 @@ import org.junit.runner.RunWith;
 import org.kgusarov.integration.spring.netty.ServerClient;
 import org.kgusarov.integration.spring.netty.configuration.NettyServers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.context.SpringBootContextLoader;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,10 +26,11 @@ import static io.netty.buffer.Unpooled.copiedBuffer;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @ActiveProfiles("multiple")
-@IntegrationTest
-@ContextConfiguration(classes = MultipleServersApplication.class, loader = SpringApplicationContextLoader.class)
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+@ContextConfiguration(classes = MultipleServersApplication.class, loader = SpringBootContextLoader.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleServersIntegrationTest {
     @Autowired

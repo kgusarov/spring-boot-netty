@@ -25,7 +25,7 @@ public final class OnDisconnectEventHandler implements ChannelFutureListener {
     }
 
     @Override
-    public void operationComplete(final ChannelFuture future) throws Exception {
+    public void operationComplete(final ChannelFuture future) {
         final Channel channel = future.channel();
         final TcpEvent<Void> event = new TcpEvent<>(channel);
 

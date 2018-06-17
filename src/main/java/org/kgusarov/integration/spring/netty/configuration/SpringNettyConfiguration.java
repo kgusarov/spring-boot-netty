@@ -41,11 +41,16 @@ import static org.springframework.core.annotation.AnnotationUtils.findAnnotation
 @Configuration
 @EnableConfigurationProperties(SpringNettyConfigurationProperties.class)
 public class SpringNettyConfiguration {
-    @Autowired
-    private SpringNettyConfigurationProperties configurationProperties;
+
+    private final SpringNettyConfigurationProperties configurationProperties;
+    private final ConfigurableListableBeanFactory beanFactory;
 
     @Autowired
-    private ConfigurableListableBeanFactory beanFactory;
+    public SpringNettyConfiguration(SpringNettyConfigurationProperties configurationProperties,
+                                    ConfigurableListableBeanFactory beanFactory) {
+        this.configurationProperties = configurationProperties;
+        this.beanFactory = beanFactory;
+    }
 
     @Bean
     public NettyServers tcpServers() {

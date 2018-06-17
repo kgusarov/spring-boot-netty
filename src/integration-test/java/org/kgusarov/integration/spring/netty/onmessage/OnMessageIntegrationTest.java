@@ -10,8 +10,8 @@ import org.kgusarov.integration.spring.netty.configuration.NettyServers;
 import org.kgusarov.integration.spring.netty.onmessage.handlers.Decoder;
 import org.kgusarov.integration.spring.netty.onmessage.handlers.Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.context.SpringBootContextLoader;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,10 +25,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @ActiveProfiles("onmessage")
-@IntegrationTest
-@ContextConfiguration(classes = OnMessageApplication.class, loader = SpringApplicationContextLoader.class)
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+@ContextConfiguration(classes = OnMessageApplication.class, loader = SpringBootContextLoader.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class OnMessageIntegrationTest {
     @Autowired
@@ -36,7 +37,7 @@ public class OnMessageIntegrationTest {
 
     @Test
     @DirtiesContext
-    public void testServersShouldBePresent() throws Exception {
+    public void testServersShouldBePresent() {
         assertThat(servers, not(hasSize(0)));
     }
 
@@ -51,8 +52,13 @@ public class OnMessageIntegrationTest {
         final SettableFuture<String> strFuture = SettableFuture.create();
         final SettableFuture<Long> longFuture = SettableFuture.create();
 
-        final ServerClient client = new ServerClient(40000, "localhost", new Decoder(), new Encoder(),
-                new ClientHandler(strFuture, longFuture));
+        final ServerClient client = new ServerClient(
+                40000,
+                "localhost",
+                new Decoder(),
+                new Encoder(),
+                new ClientHandler(strFuture, longFuture)
+        );
 
         client.connect();
         client.writeAndFlush("Hello, world!").syncUninterruptibly();

@@ -10,8 +10,8 @@ import org.kgusarov.integration.spring.netty.etc.WaitForProcessingToComplete;
 import org.kgusarov.integration.spring.netty.onconnect.handlers.OnConnectHandler1;
 import org.kgusarov.integration.spring.netty.onconnect.handlers.OnConnectHandler2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.context.SpringBootContextLoader;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,14 +22,15 @@ import java.util.concurrent.TimeUnit;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @ActiveProfiles("onconnect")
-@IntegrationTest
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 @ContextConfiguration(classes = {
         OnConnectApplication.class,
         HandlerCallStack.class,
         TcpEventStack.class
-}, loader = SpringApplicationContextLoader.class)
+}, loader = SpringBootContextLoader.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class OnConnectIntegrationTest {
     @Autowired
