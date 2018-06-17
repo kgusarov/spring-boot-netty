@@ -1,0 +1,58 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'org.kgusarov'
+version = '1.0.2-SNAPSHOT'
+
+description = "Spring Boot Netty integration"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+configurations.all {
+}
+
+repositories {
+    maven { url "http://repo.maven.apache.org/maven2" }
+}
+
+sourceSets {
+    test {
+        java {
+            srcDir "src/test/java"
+            srcDir "src/integration-test/java"
+        }
+        resources {
+            srcDir "src/test/resources"
+            srcDir "src/integration-test/resources"
+        }
+    }
+}
+
+ext {
+    springBootVersion = '1.5.8.RELEASE'
+}
+
+dependencies {
+    compile group: 'io.netty', name: 'netty-all', version: '4.1.25.Final'
+    compile(group: 'org.springframework.boot', name: 'spring-boot-starter', version: '1.5.8.RELEASE') {
+        exclude(module: 'slf4j-api')
+    }
+
+    compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '1.5.8.RELEASE'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: 'com.google.guava', name: 'guava', version: '23.0'
+    compile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.0'
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.10.Final'
+    compile group: 'javax.el', name: 'javax.el-api', version: '3.0.1-b06'
+    compile group: 'org.glassfish', name: 'javax.el', version: '3.0.1-b10'
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.8.RELEASE'
+//    testCompile(group: 'org.mockito', name: 'mockito-core', version: '1.10.19') {
+//        exclude(module: 'hamcrest-core')
+//    }
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

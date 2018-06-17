@@ -18,8 +18,13 @@ import java.util.stream.Collectors;
 @Component
 @ConditionalOnBean(NettyServers.class)
 public final class TcpServerLifeCycle {
+
+    private final NettyServers nettyServers;
+
     @Autowired
-    private NettyServers nettyServers;
+    public TcpServerLifeCycle(NettyServers nettyServers) {
+        this.nettyServers = nettyServers;
+    }
 
     /**
      * Start all servers
@@ -40,6 +45,6 @@ public final class TcpServerLifeCycle {
      */
     @PreDestroy
     public void stop() {
-        nettyServers.stream().forEach(TcpServer::stop);
+        nettyServers.forEach(TcpServer::stop);
     }
 }

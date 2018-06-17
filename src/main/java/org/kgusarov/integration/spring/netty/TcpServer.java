@@ -105,7 +105,7 @@ public final class TcpServer {
     /**
      * Stops the current server
      */
-    public void stop() {
+    void stop() {
         LOGGER.info("Stopping Netty server @{}:{}", host, port);
 
         workerThreadGroup.shutdownGracefully();
@@ -148,7 +148,7 @@ public final class TcpServer {
      *
      * @return              Empty future that will resolve when server will actually start
      */
-    public ListenableFuture<Void> start() {
+    ListenableFuture<Void> start() {
         if (!channelActiveHandlers.isEmpty()) {
             int i = 1;
             for (final Supplier<ChannelHandler> channelActiveHandler : channelActiveHandlers) {
@@ -191,7 +191,7 @@ public final class TcpServer {
         return bootstrap.channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(final SocketChannel ch) throws Exception {
+                    protected void initChannel(final SocketChannel ch) {
                         TcpServer.this.initChildChannel(ch);
                     }
                 });

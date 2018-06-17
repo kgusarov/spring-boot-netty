@@ -11,8 +11,8 @@ import org.kgusarov.integration.spring.netty.etc.WaitForProcessingToComplete;
 import org.kgusarov.integration.spring.netty.ondisconnect.handlers.OnDisconnectHandler1;
 import org.kgusarov.integration.spring.netty.ondisconnect.handlers.OnDisconnectHandler2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.context.SpringBootContextLoader;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,18 +21,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 @ActiveProfiles("ondisconnect")
-@IntegrationTest
+@SpringBootTest
 @ContextConfiguration(classes = {
         OnDisconnectApplication.class,
         HandlerCallStack.class,
         TcpEventStack.class,
         HandlerStack.class
-}, loader = SpringApplicationContextLoader.class)
+}, loader = SpringBootContextLoader.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class OnDisconnectIntegrationTest {
     @Autowired
