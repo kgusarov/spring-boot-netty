@@ -13,6 +13,7 @@ import static java.net.InetAddress.getLoopbackAddress;
 import static java.net.NetworkInterface.getNetworkInterfaces;
 
 public class ChannelOptionsTest {
+
     @Test
     public void testOptionsHaveCorrectTypes() throws Exception {
         final ServerBootstrap bootstrap = new ServerBootstrap();
@@ -46,4 +47,5 @@ public class ChannelOptionsTest {
             bootstrap.childOption(entry.getKey(), entry.getValue());
         }
     }
+
 }

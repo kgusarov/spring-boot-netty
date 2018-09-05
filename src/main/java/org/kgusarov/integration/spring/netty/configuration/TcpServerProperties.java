@@ -1,8 +1,8 @@
 package org.kgusarov.integration.spring.netty.configuration;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.kgusarov.integration.spring.netty.ChannelOptions;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**

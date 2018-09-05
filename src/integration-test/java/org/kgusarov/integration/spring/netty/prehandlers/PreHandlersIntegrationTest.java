@@ -13,8 +13,8 @@ import org.kgusarov.integration.spring.netty.prehandlers.handlers.LongEncoder;
 import org.kgusarov.integration.spring.netty.prehandlers.handlers.LongInverter;
 import org.kgusarov.integration.spring.netty.prehandlers.handlers.LongResponder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.context.SpringBootContextLoader;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,13 +26,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 @ActiveProfiles("prehandlers")
-@IntegrationTest
+@SpringBootTest
 @ContextConfiguration(classes = {
         PreHandlersApplication.class,
         HandlerCallStack.class
-}, loader = SpringApplicationContextLoader.class)
+}, loader = SpringBootContextLoader.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class PreHandlersIntegrationTest {
+
     @Autowired
     private NettyServers servers;
 
