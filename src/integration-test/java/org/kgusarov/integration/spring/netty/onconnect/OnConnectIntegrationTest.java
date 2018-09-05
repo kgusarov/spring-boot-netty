@@ -4,11 +4,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kgusarov.integration.spring.netty.ServerClient;
 import org.kgusarov.integration.spring.netty.configuration.NettyServers;
-import org.kgusarov.integration.spring.netty.etc.HandlerCallStack;
-import org.kgusarov.integration.spring.netty.etc.TcpEventStack;
+import org.kgusarov.integration.spring.netty.etc.HandlerMethodCallStack;
 import org.kgusarov.integration.spring.netty.etc.WaitForProcessingToComplete;
-import org.kgusarov.integration.spring.netty.onconnect.handlers.OnConnectHandler1;
-import org.kgusarov.integration.spring.netty.onconnect.handlers.OnConnectHandler2;
+import org.kgusarov.integration.spring.netty.onconnect.handlers.OnConnectController;
+import org.kgusarov.integration.spring.netty.onconnect.handlers.TransactionalOnConnectController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootContextLoader;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,15 +19,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 @ActiveProfiles("onconnect")
 @SpringBootTest
 @ContextConfiguration(classes = {
         OnConnectApplication.class,
-        HandlerCallStack.class,
-        TcpEventStack.class
+        HandlerMethodCallStack.class
 }, loader = SpringBootContextLoader.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class OnConnectIntegrationTest {
@@ -36,10 +33,7 @@ public class OnConnectIntegrationTest {
     private NettyServers servers;
 
     @Autowired
-    private HandlerCallStack handlerCallStack;
-
-    @Autowired
-    private TcpEventStack tcpEventStack;
+    private HandlerMethodCallStack handlerCallStack;
 
     @Autowired
     private WaitForProcessingToComplete waitForProcessingToComplete;
@@ -52,6 +46,7 @@ public class OnConnectIntegrationTest {
 
     @Test
     @DirtiesContext
+    @SuppressWarnings("unchecked")
     public void testHandlersAddedInCorrectOrder() throws Exception {
         final ServerClient client = new ServerClient(40000, "localhost");
 
@@ -60,15 +55,13 @@ public class OnConnectIntegrationTest {
 
         waitForProcessingToComplete.await(30, TimeUnit.SECONDS);
 
-        assertEquals(4, handlerCallStack.size());
-        assertEquals(4, tcpEventStack.size());
-
-        assertThat(handlerCallStack.get(0), is(equalTo(OnConnectHandler1.class)));
-        assertThat(handlerCallStack.get(1), is(equalTo(OnConnectHandler2.class)));
-        assertThat(handlerCallStack.get(2), is(equalTo(OnConnectHandler1.class)));
-        assertThat(handlerCallStack.get(3), is(equalTo(OnConnectHandler2.class)));
-
-        assertEquals(tcpEventStack.get(0), tcpEventStack.get(1));
-        assertEquals(tcpEventStack.get(2), tcpEventStack.get(3));
+        assertThat(handlerCallStack, contains(
+                is(OnConnectController.ON_CONNECT1),
+                is(OnConnectController.ON_CONNECT2),
+                is(TransactionalOnConnectController.ON_CONNECT),
+                is(OnConnectController.ON_CONNECT1),
+                is(OnConnectController.ON_CONNECT2),
+                is(TransactionalOnConnectController.ON_CONNECT)
+        ));
     }
 }

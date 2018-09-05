@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.Maps.immutableEntry;
-import static com.google.common.collect.Sets.symmetricDifference;
 import static com.google.common.collect.Sets.union;
 import static org.springframework.core.GenericTypeResolver.resolveTypeArguments;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
@@ -115,14 +114,7 @@ public class SpringNettyConfiguration {
                                        final Map<String, Object> disconnectHandlers,
                                        final Map<String, Object> messageHandlers) {
 
-        final Set<String> serversInConfig = servers.stream()
-                .map(TcpServerProperties::getName)
-                .distinct()
-                .collect(Collectors.toSet());
 
-        if (serversInConfig.size() != servers.size()) {
-            throw new IllegalStateException("Configuration has duplicate server definitions");
-        }
 
         final Set<String> serversInHandlers = union(
                 union(collectServerNames(filters, NettyFilter.class, NettyFilter::serverName),
@@ -131,10 +123,10 @@ public class SpringNettyConfiguration {
                         collectServerNames(messageHandlers, On.class, On::serverName))
         );
 
-        final Set<String> diff = symmetricDifference(serversInConfig, serversInHandlers);
-        if (!diff.isEmpty()) {
-            throw new IllegalStateException("Handlers are not present both in config and handler beans: " + diff);
-        }
+//        final Set<String> diff = symmetricDifference(serversInConfig, serversInHandlers);
+//        if (!diff.isEmpty()) {
+//            throw new IllegalStateException("Handlers are not present both in config and handler beans: " + diff);
+//        }
     }
 
     private <T extends Annotation> Set<String> collectServerNames(

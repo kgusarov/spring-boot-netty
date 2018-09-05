@@ -56,6 +56,8 @@ def javaxElVersion = '3.0.1-b10'
 def javaxElApiVersion = '3.0.1-b06'
 def hibernateValidatorVersion = '6.0.12.Final'
 def findbugsAnnotationsVersion = '3.0.0'
+def h2Version = '1.4.197'
+def jaxbApiVersion = '2.3.0'
 
 dependencies {
     compile group: 'io.netty', name: 'netty-all', version: nettyVersion
@@ -70,4 +72,10 @@ dependencies {
     annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: springBootVersion
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+    testCompile (group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: springBootVersion) {
+        exclude(module: 'jboss-logging')
+        exclude(module: 'classmate')
+    }
+    testCompile group: 'com.h2database', name: 'h2', version: h2Version
+    testCompile group: 'javax.xml.bind', name: 'jaxb-api', version: jaxbApiVersion
 }

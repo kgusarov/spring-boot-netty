@@ -15,6 +15,6 @@ public class OnConnectApplication {
 
     @Bean
     public WaitForProcessingToComplete waitForProcessingToComplete() {
-        return new WaitForProcessingToComplete(4);
+        return new WaitForProcessingToComplete(6);
     }
 }
