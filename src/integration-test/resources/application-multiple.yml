@@ -3,7 +3,15 @@ netty:
     - name: server1
       host: localhost
       port: 40000
+      options:
+        soReuseAddr: true
+      childOptions:
+        tcpNodelay: true
 
     - name: server2
       host: localhost
       port: 40001
+      options:
+        soReuseAddr: true
+      childOptions:
+        tcpNodelay: true
