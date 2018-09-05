@@ -3,6 +3,8 @@ package org.kgusarov.integration.spring.netty.events;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 /**
@@ -53,8 +55,9 @@ public final class TcpEvent<T> {
      *
      * @return              Channel handler context object
      */
-    public Optional<ChannelHandlerContext> ctx() {
-        return Optional.ofNullable(ctx);
+    @Nullable
+    public ChannelHandlerContext ctx() {
+        return ctx;
     }
 
     /**
@@ -62,8 +65,9 @@ public final class TcpEvent<T> {
      *
      * @return              Netty channel
      */
-    public Optional<Channel> channel() {
-        return Optional.ofNullable(channel);
+    @Nonnull
+    public Channel channel() {
+        return channel;
     }
 
     /**

@@ -10,8 +10,18 @@ description = "Spring Boot Netty integration"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = false
+    }
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+    options.deprecation = true
+    options.compilerArgs << "-Xlint:deprecation"
+    options.compilerArgs << "-Xlint:unchecked"
 }
 
 configurations.all {
@@ -50,13 +60,14 @@ def findbugsAnnotationsVersion = '3.0.0'
 dependencies {
     compile group: 'io.netty', name: 'netty-all', version: nettyVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBootVersion
-    compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: springBootVersion
     compile group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
     compile group: 'com.google.guava', name: 'guava', version: guavaVersion
     compile group: 'com.google.code.findbugs', name: 'annotations', version: findbugsAnnotationsVersion
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: hibernateValidatorVersion
     compile group: 'javax.el', name: 'javax.el-api', version: javaxElApiVersion
     compile group: 'org.glassfish', name: 'javax.el', version: javaxElVersion
+
+    annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: springBootVersion
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
 }

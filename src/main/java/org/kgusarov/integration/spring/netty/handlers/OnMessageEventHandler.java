@@ -31,9 +31,14 @@ public final class OnMessageEventHandler<T> extends ChannelInboundHandlerAdapter
 
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
-        if (messageType.isAssignableFrom(msg.getClass())) {
+        final Class<?> messageClass = msg.getClass();
+        if (messageType.isAssignableFrom(messageClass)) {
             final TcpEvent<T> event = new TcpEvent<>(ctx, (T) msg);
-            handlerList.forEach(h -> h.handle(event));
+
+            //noinspection CodeBlock2Expr
+            handlerList.forEach(h -> {
+                h.handle(event);
+            });
         }
 
         super.channelRead(ctx, msg);

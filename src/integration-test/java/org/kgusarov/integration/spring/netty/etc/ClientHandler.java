@@ -9,12 +9,13 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     private final SettableFuture<Long>[] responseHolders;
     private int currentResponse;
 
+    @SafeVarargs
     public ClientHandler(final SettableFuture<Long>... responseHolders) {
         this.responseHolders = responseHolders;
     }
 
     @Override
-    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
         final ByteBuf buf = (ByteBuf) msg;
         final long i = buf.readLong();
 

@@ -10,11 +10,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
 import static org.kgusarov.integration.spring.netty.handlers.FlashPolicyHandler.POLICY_FILE_REQUEST;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -31,7 +30,7 @@ public class FlashPolicyHandlerTest {
     private final FlashPolicyHandler handler = new FlashPolicyHandler();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         when(channelFuture.addListener(ChannelFutureListener.CLOSE)).thenReturn(channelFuture);
         when(ctx.writeAndFlush(any(ByteBuf.class))).thenReturn(channelFuture);
         when(ctx.pipeline()).thenReturn(channelPipeline);

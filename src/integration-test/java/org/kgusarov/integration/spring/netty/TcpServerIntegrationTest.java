@@ -24,7 +24,7 @@ public class TcpServerIntegrationTest {
     private TcpServer tcpServer;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         final ChannelOptions childOptions = new ChannelOptions();
         childOptions.setTcpNodelay(true);
 
@@ -43,7 +43,7 @@ public class TcpServerIntegrationTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         tcpServer.stop();
     }
 
@@ -169,28 +169,29 @@ public class TcpServerIntegrationTest {
 
     private static class EchoServerDecoder extends ReplayingDecoder<Long> {
         @Override
-        protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) throws Exception {
+        protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) {
             out.add(in.readLong());
         }
     }
 
     private static class EchoServerEncoder extends MessageToByteEncoder<Long> {
         @Override
-        protected void encode(final ChannelHandlerContext ctx, final Long msg, final ByteBuf out) throws Exception {
+        protected void encode(final ChannelHandlerContext ctx, final Long msg, final ByteBuf out) {
             out.writeLong(msg);
         }
     }
 
-    private static class EchoClientHandler extends ChannelInboundHandlerAdapter {
+    private static final class EchoClientHandler extends ChannelInboundHandlerAdapter {
         private final SettableFuture<Long>[] responseHolders;
-        private int currentResponse = 0;
+        private int currentResponse;
 
+        @SafeVarargs
         private EchoClientHandler(final SettableFuture<Long>... responseHolders) {
             this.responseHolders = responseHolders;
         }
 
         @Override
-        public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
             final ByteBuf buf = (ByteBuf) msg;
             final long i = buf.readLong();
 
@@ -201,7 +202,7 @@ public class TcpServerIntegrationTest {
 
     private static class EchoServerHandler extends ChannelInboundHandlerAdapter {
         @Override
-        public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
             LOGGER.info("Message from client: " + msg);
 
             ctx.writeAndFlush(msg);
@@ -212,12 +213,12 @@ public class TcpServerIntegrationTest {
     private static class OnDisconnectHandler implements ChannelFutureListener {
         private final AtomicInteger disconnects;
 
-        public OnDisconnectHandler(final AtomicInteger disconnects) {
+        OnDisconnectHandler(final AtomicInteger disconnects) {
             this.disconnects = disconnects;
         }
 
         @Override
-        public void operationComplete(final ChannelFuture future) throws Exception {
+        public void operationComplete(final ChannelFuture future) {
             LOGGER.debug("Client disconnected!");
             disconnects.incrementAndGet();
         }
@@ -227,12 +228,12 @@ public class TcpServerIntegrationTest {
     private static class OnConnectHandler extends ChannelInboundHandlerAdapter {
         private final AtomicInteger connections;
 
-        public OnConnectHandler(final AtomicInteger connections) {
+        OnConnectHandler(final AtomicInteger connections) {
             this.connections = connections;
         }
 
         @Override
-        public void channelActive(final ChannelHandlerContext ctx) throws Exception {
+        public void channelActive(final ChannelHandlerContext ctx) {
             LOGGER.debug("Client connected!");
             connections.incrementAndGet();
 

@@ -10,7 +10,7 @@ import org.kgusarov.integration.spring.netty.events.TcpEventHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @ChannelHandler.Sharable
-@OnConnect(serverName = "server1", priority = 1)
+@OnConnect(serverName = "server1", priority = 2)
 public class OnConnectHandler2 implements TcpEventHandler<Void> {
     @Autowired
     private HandlerCallStack handlerCallStack;

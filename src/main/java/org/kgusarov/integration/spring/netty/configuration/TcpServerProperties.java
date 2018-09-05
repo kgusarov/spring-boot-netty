@@ -9,14 +9,9 @@ import javax.validation.constraints.NotNull;
  * Configuration properties for a single TCP server instance
  */
 public class TcpServerProperties {
-    @NotBlank
-    private String name;
-
-    @NotBlank
-    private String host;
-
-    @NotNull
-    private Integer port;
+    private @NotBlank String name;
+    private @NotBlank String host;
+    private @NotNull Integer port;
 
     private Integer bossThreads;
     private Integer workerThreads;

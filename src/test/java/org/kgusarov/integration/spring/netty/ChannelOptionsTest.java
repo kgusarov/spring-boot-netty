@@ -13,8 +13,8 @@ import static java.net.InetAddress.getLoopbackAddress;
 import static java.net.NetworkInterface.getNetworkInterfaces;
 
 public class ChannelOptionsTest {
-
     @Test
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void testOptionsHaveCorrectTypes() throws Exception {
         final ServerBootstrap bootstrap = new ServerBootstrap();
         final ChannelOptions options = new ChannelOptions();
@@ -42,10 +42,9 @@ public class ChannelOptionsTest {
         options.setTcpNodelay(true);
 
         final Map<ChannelOption, Object> channelOptionMap = options.get();
-        for (final Map.Entry<ChannelOption, Object> entry : channelOptionMap.entrySet()) {
-            bootstrap.option(entry.getKey(), entry.getValue());
-            bootstrap.childOption(entry.getKey(), entry.getValue());
-        }
+        channelOptionMap.forEach((key, value) -> {
+            bootstrap.option(key, value);
+            bootstrap.childOption(key, value);
+        });
     }
-
 }

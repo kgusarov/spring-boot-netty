@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 /**
  * A typesafe configuration for {@code io.netty.channel.ChannelOption} options
  */
+@SuppressWarnings("rawtypes")
 public final class ChannelOptions implements Supplier<Map<ChannelOption, Object>> {
     private final Map<ChannelOption, Object> options = Maps.newHashMap();
 

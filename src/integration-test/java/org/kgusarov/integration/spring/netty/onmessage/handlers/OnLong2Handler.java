@@ -6,7 +6,7 @@ import org.kgusarov.integration.spring.netty.events.TcpEvent;
 import org.kgusarov.integration.spring.netty.events.TcpEventHandler;
 
 @ChannelHandler.Sharable
-@On(serverName = "server1", priority = 1, dataType = Long.class)
+@On(serverName = "server1", priority = 2, dataType = Long.class)
 public class OnLong2Handler implements TcpEventHandler<Long> {
     @Override
     public void handle(final TcpEvent<Long> event) {

@@ -6,10 +6,13 @@ import org.kgusarov.integration.spring.netty.events.TcpEvent;
 import org.kgusarov.integration.spring.netty.events.TcpEventHandler;
 
 @ChannelHandler.Sharable
-@On(serverName = "server1", priority = 0, dataType = Long.class)
+@On(serverName = "server1", priority = 1, dataType = Long.class)
 public class OnLongHandler implements TcpEventHandler<Long> {
     @Override
     public void handle(final TcpEvent<Long> event) {
-        event.ctx().get().writeAndFlush(event.data().get());
+        //noinspection CodeBlock2Expr
+        event.data().ifPresent(data -> {
+            event.channel().writeAndFlush(data);
+        });
     }
 }

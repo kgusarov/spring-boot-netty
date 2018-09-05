@@ -1,6 +1,16 @@
 language: java
+sudo: false
 jdk:
   - oraclejdk8
+  - oraclejdk9
+  - oraclejdk10
+  - openjdk8
+  - openjdk9
+  - openjdk10
+
+notifications:
+  email:
+    - konstantins.gusarovs@gmail.com
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

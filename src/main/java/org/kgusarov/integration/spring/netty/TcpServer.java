@@ -192,7 +192,7 @@ public final class TcpServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(final SocketChannel ch) {
-                        TcpServer.this.initChildChannel(ch);
+                        initChildChannel(ch);
                     }
                 });
     }
@@ -208,12 +208,13 @@ public final class TcpServer {
 
         if (!closeFutureListeners.isEmpty()) {
             for (final Supplier<ChannelFutureListener> listener : closeFutureListeners) {
-                ch.closeFuture().addListener(listener.get());
+                final ChannelFutureListener cfl = listener.get();
+                ch.closeFuture().addListener(cfl);
             }
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private void setOptions(final ServerBootstrap bootstrap) {
         final Map<ChannelOption, Object> channelOptions = options.get();
         final Map<ChannelOption, Object> childChannelOptions = childOptions.get();

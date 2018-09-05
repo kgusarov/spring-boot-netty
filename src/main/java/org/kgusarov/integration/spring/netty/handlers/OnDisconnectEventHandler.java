@@ -29,6 +29,9 @@ public final class OnDisconnectEventHandler implements ChannelFutureListener {
         final Channel channel = future.channel();
         final TcpEvent<Void> event = new TcpEvent<>(channel);
 
-        handlerList.forEach(h -> h.handle(event));
+        //noinspection CodeBlock2Expr
+        handlerList.forEach(h -> {
+            h.handle(event);
+        });
     }
 }

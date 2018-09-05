@@ -5,10 +5,11 @@ import org.springframework.stereotype.Component;
 import java.lang.annotation.*;
 
 /**
- * This annotation can be used to mark so called "Pre-handlers" - handlers that will be
+ * This annotation can be used to mark so called "Filters" - handlers that will be
  * invoked before any {@code org.kgusarov.integration.spring.netty.events.TcpEventHandler}
- * instances will start message processing. This may include encoders/decoders and another
- * stuff that can be used to preprocess the message before handling it.
+ * instances will start message processing or after it will be finished. So basically, handlers will
+ * work in a way similar to servlet filters. This may include encoders/decoders and another
+ * stuff that can be used to preprocess the message before handling it or post-process it afterwards.
  *
  * Class should implement {@code io.netty.channel.ChannelHandler}
  * interface. This is enforced during appropriate bean construction
@@ -17,7 +18,7 @@ import java.lang.annotation.*;
 @Inherited
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PreHandler {
+public @interface NettyFilter {
     /**
      * Get logical name of the server annotated event handler should be attached to
      *

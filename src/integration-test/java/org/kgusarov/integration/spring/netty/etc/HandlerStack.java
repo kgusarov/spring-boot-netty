@@ -6,5 +6,5 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
 @Component
-public class HandlerStack extends ArrayList<TcpEventHandler> {
+public class HandlerStack extends ArrayList<TcpEventHandler<?>> {
 }

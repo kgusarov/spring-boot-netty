@@ -5,7 +5,7 @@ import org.springframework.beans.factory.BeanCreationException;
 
 public class DuplicateDefsIntegrationTest {
     @Test(expected = BeanCreationException.class)
-    public void testThereShouldBeAnException() throws Exception {
+    public void testThereShouldBeAnException() {
         DuplicateDefsApplication.main("--spring.profiles.active=duplicatedefs");
     }
 }

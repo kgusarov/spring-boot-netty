@@ -37,7 +37,7 @@ public class MultipleServersIntegrationTest {
 
     @Test
     @DirtiesContext
-    public void testServersShouldBePresent() throws Exception {
+    public void testServersShouldBePresent() {
         assertThat(servers, hasSize(2));
     }
 
@@ -71,7 +71,7 @@ public class MultipleServersIntegrationTest {
         }
 
         @Override
-        public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
             final ByteBuf byteBuf = (ByteBuf) msg;
             final byte[] bytes = ByteBufUtil.getBytes(byteBuf);
             final String str = new String(bytes, CharsetUtil.UTF_8);

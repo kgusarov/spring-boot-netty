@@ -7,10 +7,10 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import org.kgusarov.integration.spring.netty.ChannelOptions;
 import org.kgusarov.integration.spring.netty.TcpServer;
+import org.kgusarov.integration.spring.netty.annotations.NettyFilter;
 import org.kgusarov.integration.spring.netty.annotations.On;
 import org.kgusarov.integration.spring.netty.annotations.OnConnect;
 import org.kgusarov.integration.spring.netty.annotations.OnDisconnect;
-import org.kgusarov.integration.spring.netty.annotations.PreHandler;
 import org.kgusarov.integration.spring.netty.events.TcpEventHandler;
 import org.kgusarov.integration.spring.netty.handlers.OnConnectEventHandler;
 import org.kgusarov.integration.spring.netty.handlers.OnDisconnectEventHandler;
@@ -46,8 +46,9 @@ public class SpringNettyConfiguration {
     private final ConfigurableListableBeanFactory beanFactory;
 
     @Autowired
-    public SpringNettyConfiguration(SpringNettyConfigurationProperties configurationProperties,
-                                    ConfigurableListableBeanFactory beanFactory) {
+    public SpringNettyConfiguration(final SpringNettyConfigurationProperties configurationProperties,
+                                    final ConfigurableListableBeanFactory beanFactory) {
+
         this.configurationProperties = configurationProperties;
         this.beanFactory = beanFactory;
     }
@@ -61,12 +62,12 @@ public class SpringNettyConfiguration {
             return result;
         }
 
-        final Map<String, Object> preHandlers = beanFactory.getBeansWithAnnotation(PreHandler.class);
+        final Map<String, Object> filters = beanFactory.getBeansWithAnnotation(NettyFilter.class);
         final Map<String, Object> connectHandlers = beanFactory.getBeansWithAnnotation(OnConnect.class);
         final Map<String, Object> disconnectHandlers = beanFactory.getBeansWithAnnotation(OnDisconnect.class);
         final Map<String, Object> messageHandlers = beanFactory.getBeansWithAnnotation(On.class);
 
-        validateConfiguration(servers, preHandlers, connectHandlers, disconnectHandlers, messageHandlers);
+        validateConfiguration(servers, filters, connectHandlers, disconnectHandlers, messageHandlers);
 
         for (final TcpServerProperties serverProperties : servers) {
             final String name = serverProperties.getName();
@@ -97,7 +98,7 @@ public class SpringNettyConfiguration {
                 server.setChildOptions(childOptions);
             }
 
-            addPreHandlers(name, server, preHandlers);
+            addFilters(name, server, filters);
             addConnectHandlers(name, server, connectHandlers);
             addDisconnectHandlers(name, server, disconnectHandlers);
             addAllMessageHandlers(name, server, messageHandlers);
@@ -108,7 +109,7 @@ public class SpringNettyConfiguration {
     }
 
     private void validateConfiguration(final List<TcpServerProperties> servers,
-                                       final Map<String, Object> preHandlers,
+                                       final Map<String, Object> filters,
                                        final Map<String, Object> connectHandlers,
                                        final Map<String, Object> disconnectHandlers,
                                        final Map<String, Object> messageHandlers) {
@@ -123,7 +124,7 @@ public class SpringNettyConfiguration {
         }
 
         final Set<String> serversInHandlers = union(
-                union(collectServerNames(preHandlers, PreHandler.class, PreHandler::serverName),
+                union(collectServerNames(filters, NettyFilter.class, NettyFilter::serverName),
                         collectServerNames(connectHandlers, OnConnect.class, OnConnect::serverName)),
                 union(collectServerNames(disconnectHandlers, OnDisconnect.class, OnDisconnect::serverName),
                         collectServerNames(messageHandlers, On.class, On::serverName))
@@ -154,7 +155,7 @@ public class SpringNettyConfiguration {
                 serverName, disconnectHandlers, OnDisconnect.class, OnDisconnect::priority, OnDisconnect::serverName);
 
         final Supplier<ChannelFutureListener> channelFutureListenerSupplier = () -> {
-            List<TcpEventHandler<Void>> handlers = underlying.stream()
+            final List<TcpEventHandler<Void>> handlers = underlying.stream()
                     .map(Supplier::get)
                     .map(h -> (TcpEventHandler<Void>) h)
                     .collect(Collectors.toList());
@@ -174,7 +175,7 @@ public class SpringNettyConfiguration {
                 serverName, connectHandlers, OnConnect.class, OnConnect::priority, OnConnect::serverName);
 
         final Supplier<ChannelHandler> channelHandlerSupplier = () -> {
-            List<TcpEventHandler<Void>> handlers = underlying.stream()
+            final List<TcpEventHandler<Void>> handlers = underlying.stream()
                     .map(Supplier::get)
                     .map(h -> (TcpEventHandler<Void>) h)
                     .collect(Collectors.toList());
@@ -256,22 +257,22 @@ public class SpringNettyConfiguration {
                 .collect(Collectors.toList());
     }
 
-    private void addPreHandlers(final String serverName, final TcpServer server,
-                                final Map<String, Object> preHandlers) {
+    private void addFilters(final String serverName, final TcpServer server,
+                            final Map<String, Object> filters) {
 
-        final Optional<Object> nonHandlerBean = preHandlers.values().stream()
+        final Optional<Object> nonHandlerBean = filters.values().stream()
                 .filter(o -> !(o instanceof ChannelHandler))
                 .findAny();
 
         if (nonHandlerBean.isPresent()) {
-            throw new IllegalStateException("Bean annotated with @PreHandler doesn't implement " +
+            throw new IllegalStateException("Bean annotated with @NettyFilter doesn't implement " +
                     "ChannelHandler: " + nonHandlerBean.get());
         }
 
         final AtomicInteger counter = new AtomicInteger(0);
-        getHandlers(preHandlers, PreHandler.class, serverName, PreHandler::priority, PreHandler::serverName)
+        getHandlers(filters, NettyFilter.class, serverName, NettyFilter::priority, NettyFilter::serverName)
                 .forEach(e -> addHandler(server, (ChannelHandler) e.getValue(),
-                        "preHandler" + counter.incrementAndGet(), e.getKey()));
+                        "filter" + counter.incrementAndGet(), e.getKey()));
     }
 
     private <T extends Annotation> void checkTcpEventHandlersArePresent(final Map<String, Object> handlers,

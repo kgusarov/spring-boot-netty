@@ -72,7 +72,7 @@ public class OnMessageIntegrationTest {
         client.disconnect();
     }
 
-    private static class ClientHandler extends ChannelInboundHandlerAdapter {
+    private static final class ClientHandler extends ChannelInboundHandlerAdapter {
         private final SettableFuture<String> strFuture;
         private final SettableFuture<Long> longFuture;
 

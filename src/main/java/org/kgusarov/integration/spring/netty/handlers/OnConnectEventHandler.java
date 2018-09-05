@@ -28,7 +28,11 @@ public final class OnConnectEventHandler extends ChannelInboundHandlerAdapter {
         ctx.pipeline().remove(this);
 
         final TcpEvent<Void> event = new TcpEvent<>(ctx);
-        handlerList.forEach(h -> h.handle(event));
+
+        //noinspection CodeBlock2Expr
+        handlerList.forEach(h -> {
+            h.handle(event);
+        });
 
         super.channelActive(ctx);
     }

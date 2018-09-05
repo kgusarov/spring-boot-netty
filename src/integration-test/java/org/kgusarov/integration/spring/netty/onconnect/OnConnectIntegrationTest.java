@@ -46,7 +46,7 @@ public class OnConnectIntegrationTest {
 
     @Test
     @DirtiesContext
-    public void testServersShouldBePresent() throws Exception {
+    public void testServersShouldBePresent() {
         assertThat(servers, not(hasSize(0)));
     }
 

@@ -12,7 +12,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@OnDisconnect(serverName = "server1", priority = 1)
+@OnDisconnect(serverName = "server1", priority = 2)
 public class OnDisconnectHandler2 implements TcpEventHandler<Void> {
     @Autowired
     private HandlerCallStack handlerCallStack;

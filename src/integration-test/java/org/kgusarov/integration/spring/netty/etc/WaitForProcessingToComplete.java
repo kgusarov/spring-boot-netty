@@ -6,7 +6,7 @@ import java.util.concurrent.CountDownLatch;
 
 @Component
 public class WaitForProcessingToComplete extends CountDownLatch {
-    public WaitForProcessingToComplete(int count) {
+    public WaitForProcessingToComplete(final int count) {
         super(count);
     }
 }

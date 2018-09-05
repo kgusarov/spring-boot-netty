@@ -1,4 +1,4 @@
-package org.kgusarov.integration.spring.netty.prehandlers;
+package org.kgusarov.integration.spring.netty.nettyfilters;
 
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.buffer.ByteBuf;
@@ -8,10 +8,7 @@ import org.kgusarov.integration.spring.netty.ServerClient;
 import org.kgusarov.integration.spring.netty.configuration.NettyServers;
 import org.kgusarov.integration.spring.netty.etc.ClientHandler;
 import org.kgusarov.integration.spring.netty.etc.HandlerCallStack;
-import org.kgusarov.integration.spring.netty.prehandlers.handlers.LongDecoder;
-import org.kgusarov.integration.spring.netty.prehandlers.handlers.LongEncoder;
-import org.kgusarov.integration.spring.netty.prehandlers.handlers.LongInverter;
-import org.kgusarov.integration.spring.netty.prehandlers.handlers.LongResponder;
+import org.kgusarov.integration.spring.netty.nettyfilters.handlers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootContextLoader;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,14 +22,14 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-@ActiveProfiles("prehandlers")
+@ActiveProfiles("filters")
 @SpringBootTest
 @ContextConfiguration(classes = {
-        PreHandlersApplication.class,
+        NettyFiltersApplication.class,
         HandlerCallStack.class
 }, loader = SpringBootContextLoader.class)
 @RunWith(SpringJUnit4ClassRunner.class)
-public class PreHandlersIntegrationTest {
+public class NettyFiltersIntegrationTest {
 
     @Autowired
     private NettyServers servers;
@@ -42,7 +39,7 @@ public class PreHandlersIntegrationTest {
 
     @Test
     @DirtiesContext
-    public void testServersShouldBePresent() throws Exception {
+    public void testServersShouldBePresent() {
         assertThat(servers, not(hasSize(0)));
     }
 
@@ -68,16 +65,21 @@ public class PreHandlersIntegrationTest {
 
         client.disconnect();
 
-        assertEquals(8, handlerCallStack.size());
+        //noinspection unchecked
+        assertThat(handlerCallStack, contains(
+            LongDecoder.class,
+            LongInverter.class,
+            AroundResponderFilter.class,
+            LongResponder.class,
+            AroundResponderFilter.class,
+            LongEncoder.class,
 
-        assertThat(handlerCallStack.get(0), is(equalTo(LongDecoder.class)));
-        assertThat(handlerCallStack.get(1), is(equalTo(LongInverter.class)));
-        assertThat(handlerCallStack.get(2), is(equalTo(LongResponder.class)));
-        assertThat(handlerCallStack.get(3), is(equalTo(LongEncoder.class)));
-
-        assertThat(handlerCallStack.get(4), is(equalTo(LongDecoder.class)));
-        assertThat(handlerCallStack.get(5), is(equalTo(LongInverter.class)));
-        assertThat(handlerCallStack.get(6), is(equalTo(LongResponder.class)));
-        assertThat(handlerCallStack.get(7), is(equalTo(LongEncoder.class)));
+            LongDecoder.class,
+            LongInverter.class,
+            AroundResponderFilter.class,
+            LongResponder.class,
+            AroundResponderFilter.class,
+            LongEncoder.class
+        ));
     }
 }

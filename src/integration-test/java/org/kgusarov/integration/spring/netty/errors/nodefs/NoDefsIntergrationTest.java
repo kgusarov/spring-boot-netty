@@ -5,7 +5,7 @@ import org.springframework.beans.factory.BeanCreationException;
 
 public class NoDefsIntergrationTest {
     @Test(expected = BeanCreationException.class)
-    public void testThereShouldBeAnException() throws Exception {
+    public void testThereShouldBeAnException() {
         NoDefsApplication.main("--spring.profiles.active=nodefs");
     }
 }
