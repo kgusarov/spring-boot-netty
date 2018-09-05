@@ -12,6 +12,7 @@ import java.lang.annotation.*;
  */
 @Component
 @Inherited
+@Deprecated
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OnDisconnect {

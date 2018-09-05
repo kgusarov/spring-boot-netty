@@ -6,6 +6,7 @@ package org.kgusarov.integration.spring.netty.events;
  * @param <T>           Type of an event-associated data
  */
 @FunctionalInterface
+@Deprecated
 public interface TcpEventHandler<T> {
     /**
      * Handle the TCP event

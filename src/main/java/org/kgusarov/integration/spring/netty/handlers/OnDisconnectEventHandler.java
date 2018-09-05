@@ -12,6 +12,7 @@ import java.util.List;
  * Handler that notifies all {@code TcpEventHandler} instances about client disconnection. This is part of
  * internal API.
  */
+@Deprecated
 public final class OnDisconnectEventHandler implements ChannelFutureListener {
     private final List<TcpEventHandler<Void>> handlerList;
 

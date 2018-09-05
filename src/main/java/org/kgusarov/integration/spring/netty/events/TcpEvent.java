@@ -12,6 +12,7 @@ import java.util.Optional;
  *
  * @param <T>       Type of an event-associated data
  */
+@Deprecated
 public final class TcpEvent<T> {
     private final T data;
     private final ChannelHandlerContext ctx;

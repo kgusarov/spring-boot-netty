@@ -39,6 +39,7 @@ import static org.springframework.core.annotation.AnnotationUtils.findAnnotation
 
 @SuppressWarnings("unchecked")
 @Configuration
+@Deprecated
 @EnableConfigurationProperties(SpringNettyConfigurationProperties.class)
 public class SpringNettyConfiguration {
 

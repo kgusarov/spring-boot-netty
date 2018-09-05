@@ -14,6 +14,7 @@ import java.util.List;
  * @param <T>           Type of messages being processed by this processor
  */
 @SuppressWarnings("unchecked")
+@Deprecated
 public final class OnMessageEventHandler<T> extends ChannelInboundHandlerAdapter {
     private final List<TcpEventHandler<T>> handlerList;
     private final Class<T> messageType;
