@@ -9,10 +9,8 @@ import org.kgusarov.integration.spring.netty.ChannelOptions;
 import org.kgusarov.integration.spring.netty.TcpServer;
 import org.kgusarov.integration.spring.netty.annotations.NettyFilter;
 import org.kgusarov.integration.spring.netty.annotations.On;
-import org.kgusarov.integration.spring.netty.annotations.OnConnect;
 import org.kgusarov.integration.spring.netty.annotations.OnDisconnect;
 import org.kgusarov.integration.spring.netty.events.TcpEventHandler;
-import org.kgusarov.integration.spring.netty.handlers.OnConnectEventHandler;
 import org.kgusarov.integration.spring.netty.handlers.OnDisconnectEventHandler;
 import org.kgusarov.integration.spring.netty.handlers.OnMessageEventHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,11 +61,10 @@ public class SpringNettyConfiguration {
         }
 
         final Map<String, Object> filters = beanFactory.getBeansWithAnnotation(NettyFilter.class);
-        final Map<String, Object> connectHandlers = beanFactory.getBeansWithAnnotation(OnConnect.class);
         final Map<String, Object> disconnectHandlers = beanFactory.getBeansWithAnnotation(OnDisconnect.class);
         final Map<String, Object> messageHandlers = beanFactory.getBeansWithAnnotation(On.class);
 
-        validateConfiguration(servers, filters, connectHandlers, disconnectHandlers, messageHandlers);
+        validateConfiguration(servers, filters, disconnectHandlers, messageHandlers);
 
         for (final TcpServerProperties serverProperties : servers) {
             final String name = serverProperties.getName();
@@ -99,7 +96,6 @@ public class SpringNettyConfiguration {
             }
 
             addFilters(name, server, filters);
-            addConnectHandlers(name, server, connectHandlers);
             addDisconnectHandlers(name, server, disconnectHandlers);
             addAllMessageHandlers(name, server, messageHandlers);
             result.add(server);
@@ -110,15 +106,13 @@ public class SpringNettyConfiguration {
 
     private void validateConfiguration(final List<TcpServerProperties> servers,
                                        final Map<String, Object> filters,
-                                       final Map<String, Object> connectHandlers,
                                        final Map<String, Object> disconnectHandlers,
                                        final Map<String, Object> messageHandlers) {
 
 
 
         final Set<String> serversInHandlers = union(
-                union(collectServerNames(filters, NettyFilter.class, NettyFilter::serverName),
-                        collectServerNames(connectHandlers, OnConnect.class, OnConnect::serverName)),
+                collectServerNames(filters, NettyFilter.class, NettyFilter::serverName),
                 union(collectServerNames(disconnectHandlers, OnDisconnect.class, OnDisconnect::serverName),
                         collectServerNames(messageHandlers, On.class, On::serverName))
         );
@@ -157,26 +151,6 @@ public class SpringNettyConfiguration {
         };
 
         server.onDisconnect(channelFutureListenerSupplier);
-    }
-
-    private void addConnectHandlers(final String serverName, final TcpServer server,
-                                    final Map<String, Object> connectHandlers) {
-
-        checkTcpEventHandlersArePresent(connectHandlers, OnConnect.class, ignored -> Void.class);
-
-        final List<Supplier<TcpEventHandler>> underlying = createUnderlyingHandlerList(
-                serverName, connectHandlers, OnConnect.class, OnConnect::priority, OnConnect::serverName);
-
-        final Supplier<ChannelHandler> channelHandlerSupplier = () -> {
-            final List<TcpEventHandler<Void>> handlers = underlying.stream()
-                    .map(Supplier::get)
-                    .map(h -> (TcpEventHandler<Void>) h)
-                    .collect(Collectors.toList());
-
-            return new OnConnectEventHandler(handlers);
-        };
-
-        server.onConnect(channelHandlerSupplier);
     }
 
     private void addAllMessageHandlers(final String serverName, final TcpServer server,

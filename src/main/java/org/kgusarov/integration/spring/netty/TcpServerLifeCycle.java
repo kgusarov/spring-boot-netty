@@ -4,9 +4,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.kgusarov.integration.spring.netty.configuration.NettyServers;
 import org.springframework.beans.factory.BeanInitializationException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -17,13 +14,9 @@ import java.util.stream.Collectors;
 /**
  * Component that performs initialization of all the netty servers
  */
-@Component
-@ConditionalOnBean(NettyServers.class)
-public final class TcpServerLifeCycle {
-
+public class TcpServerLifeCycle {
     private final NettyServers nettyServers;
 
-    @Autowired
     public TcpServerLifeCycle(final NettyServers nettyServers) {
         this.nettyServers = nettyServers;
     }

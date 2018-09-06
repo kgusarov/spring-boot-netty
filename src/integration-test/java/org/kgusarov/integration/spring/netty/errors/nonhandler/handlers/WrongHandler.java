@@ -1,4 +1,4 @@
-package org.kgusarov.integration.spring.netty.errors.nonhandler1.handlers;
+package org.kgusarov.integration.spring.netty.errors.nonhandler.handlers;
 
 import org.kgusarov.integration.spring.netty.annotations.NettyFilter;
 

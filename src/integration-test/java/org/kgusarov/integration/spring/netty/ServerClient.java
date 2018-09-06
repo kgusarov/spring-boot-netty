@@ -44,7 +44,7 @@ public class ServerClient {
                     .channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(final SocketChannel ch) throws Exception {
+                        protected void initChannel(final SocketChannel ch) {
                             final ChannelPipeline p = ch.pipeline();
                             Arrays.stream(handlers).forEach(p::addLast);
                         }

@@ -1,4 +1,4 @@
-package org.kgusarov.integration.spring.netty.errors.nonhandler1;
+package org.kgusarov.integration.spring.netty.errors.nonhandler;
 
 import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;

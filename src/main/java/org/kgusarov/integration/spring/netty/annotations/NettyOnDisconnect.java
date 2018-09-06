@@ -1,21 +1,17 @@
 package org.kgusarov.integration.spring.netty.annotations;
 
-import org.springframework.stereotype.Component;
-
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * This annotation can be used to mark a class that will become a connection event
- * handler for the given TCP event.
- * Class should implement {@code org.kgusarov.integration.spring.netty.events.TcpEventHandler}
- * interface. This is enforced during appropriate bean construction
+ * This annotation can be used to mark a method that will become a disconnect event
+ * handler for the given TCP server.
  */
-@Component
-@Inherited
-@Deprecated
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface OnConnect {
+public @interface NettyOnDisconnect {
     /**
      * Get logical name of the server annotated event handler should be attached to
      *

@@ -3,3 +3,5 @@ netty:
     - name: server1
       host: localhost
       port: 40000
+      options:
+        soReuseAddr: true
