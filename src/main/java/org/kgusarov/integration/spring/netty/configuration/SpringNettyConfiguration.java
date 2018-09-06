@@ -1,18 +1,9 @@
 package org.kgusarov.integration.spring.netty.configuration;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import org.kgusarov.integration.spring.netty.ChannelOptions;
 import org.kgusarov.integration.spring.netty.TcpServer;
 import org.kgusarov.integration.spring.netty.annotations.NettyFilter;
-import org.kgusarov.integration.spring.netty.annotations.On;
-import org.kgusarov.integration.spring.netty.annotations.OnDisconnect;
-import org.kgusarov.integration.spring.netty.events.TcpEventHandler;
-import org.kgusarov.integration.spring.netty.handlers.OnDisconnectEventHandler;
-import org.kgusarov.integration.spring.netty.handlers.OnMessageEventHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -22,16 +13,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.Maps.immutableEntry;
-import static com.google.common.collect.Sets.union;
-import static org.springframework.core.GenericTypeResolver.resolveTypeArguments;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 @SuppressWarnings("unchecked")
@@ -61,10 +52,6 @@ public class SpringNettyConfiguration {
         }
 
         final Map<String, Object> filters = beanFactory.getBeansWithAnnotation(NettyFilter.class);
-        final Map<String, Object> disconnectHandlers = beanFactory.getBeansWithAnnotation(OnDisconnect.class);
-        final Map<String, Object> messageHandlers = beanFactory.getBeansWithAnnotation(On.class);
-
-        validateConfiguration(servers, filters, disconnectHandlers, messageHandlers);
 
         for (final TcpServerProperties serverProperties : servers) {
             final String name = serverProperties.getName();
@@ -96,31 +83,10 @@ public class SpringNettyConfiguration {
             }
 
             addFilters(name, server, filters);
-            addDisconnectHandlers(name, server, disconnectHandlers);
-            addAllMessageHandlers(name, server, messageHandlers);
             result.add(server);
         }
 
         return result;
-    }
-
-    private void validateConfiguration(final List<TcpServerProperties> servers,
-                                       final Map<String, Object> filters,
-                                       final Map<String, Object> disconnectHandlers,
-                                       final Map<String, Object> messageHandlers) {
-
-
-
-        final Set<String> serversInHandlers = union(
-                collectServerNames(filters, NettyFilter.class, NettyFilter::serverName),
-                union(collectServerNames(disconnectHandlers, OnDisconnect.class, OnDisconnect::serverName),
-                        collectServerNames(messageHandlers, On.class, On::serverName))
-        );
-
-//        final Set<String> diff = symmetricDifference(serversInConfig, serversInHandlers);
-//        if (!diff.isEmpty()) {
-//            throw new IllegalStateException("Handlers are not present both in config and handler beans: " + diff);
-//        }
     }
 
     private <T extends Annotation> Set<String> collectServerNames(
@@ -131,97 +97,6 @@ public class SpringNettyConfiguration {
                 .map(e -> beanFactory.findAnnotationOnBean(e.getKey(), annotationClass))
                 .map(serverNameGetter)
                 .collect(Collectors.toSet());
-    }
-
-    private void addDisconnectHandlers(final String serverName, final TcpServer server,
-                                       final Map<String, Object> disconnectHandlers) {
-
-        checkTcpEventHandlersArePresent(disconnectHandlers, OnDisconnect.class, ignored -> Void.class);
-
-        final List<Supplier<TcpEventHandler>> underlying = createUnderlyingHandlerList(
-                serverName, disconnectHandlers, OnDisconnect.class, OnDisconnect::priority, OnDisconnect::serverName);
-
-        final Supplier<ChannelFutureListener> channelFutureListenerSupplier = () -> {
-            final List<TcpEventHandler<Void>> handlers = underlying.stream()
-                    .map(Supplier::get)
-                    .map(h -> (TcpEventHandler<Void>) h)
-                    .collect(Collectors.toList());
-
-            return new OnDisconnectEventHandler(handlers);
-        };
-
-        server.onDisconnect(channelFutureListenerSupplier);
-    }
-
-    private void addAllMessageHandlers(final String serverName, final TcpServer server,
-                                       final Map<String, Object> messageHandlers) {
-
-        final Queue<Map.Entry<String, Object>> open = Queues.newArrayDeque(messageHandlers.entrySet());
-        final Set<Map.Entry<String, Object>> closed = Sets.newHashSet();
-
-        Class<?> messageType = null;
-        final Map<String, Object> concreteHandlers = Maps.newHashMap();
-
-        while (!open.isEmpty()) {
-            final Map.Entry<String, Object> next = open.poll();
-            if (closed.contains(next)) {
-                addMessageHandlers(serverName, server, concreteHandlers, messageType);
-                concreteHandlers.clear();
-                closed.clear();
-
-                messageType = null;
-            }
-
-            final Object handler = next.getValue();
-            final On annotation = findAnnotation(handler.getClass(), On.class);
-
-            assert annotation != null;
-            final Class<?> dataType = annotation.dataType();
-
-            if (messageType == null) {
-                messageType = dataType;
-                concreteHandlers.put(next.getKey(), next.getValue());
-            } else if (messageType.equals(dataType)) {
-                concreteHandlers.put(next.getKey(), next.getValue());
-            } else {
-                open.offer(next);
-                closed.add(next);
-            }
-        }
-
-        if (!concreteHandlers.isEmpty()) {
-            addMessageHandlers(serverName, server, concreteHandlers, messageType);
-        }
-    }
-
-    private <T> void addMessageHandlers(final String serverName, final TcpServer server,
-                                        final Map<String, Object> messageHandlers, final Class<T> messageType) {
-
-        checkTcpEventHandlersArePresent(messageHandlers, On.class, On::dataType);
-
-        final List<Supplier<TcpEventHandler>> underlying = createUnderlyingHandlerList(
-                serverName, messageHandlers, On.class, On::priority, On::serverName);
-
-        final List<TcpEventHandler<T>> handlers = underlying.stream()
-                .map(Supplier::get)
-                .map(h -> (TcpEventHandler<T>) h)
-                .collect(Collectors.toList());
-
-        final Supplier<ChannelHandler> channelHandlerSupplier = () -> new OnMessageEventHandler<>(handlers, messageType);
-
-        server.onConnect(channelHandlerSupplier);
-    }
-
-    private <T extends Annotation> List<Supplier<TcpEventHandler>> createUnderlyingHandlerList(final String serverName,
-                                                                                               final Map<String, Object> handlers,
-                                                                                               final Class<T> annotationClass,
-                                                                                               final Function<T, Integer> priorityGetter,
-                                                                                               final Function<T, String> serverNameGetter) {
-
-        return getHandlers(handlers, annotationClass, serverName, priorityGetter, serverNameGetter)
-                .map(e -> immutableEntry(e.getKey(), (TcpEventHandler) e.getValue()))
-                .map(e -> createHandlerBeanSupplier(e.getValue(), e.getValue().getClass(), e.getKey()))
-                .collect(Collectors.toList());
     }
 
     private void addFilters(final String serverName, final TcpServer server,
@@ -240,36 +115,6 @@ public class SpringNettyConfiguration {
         getHandlers(filters, NettyFilter.class, serverName, NettyFilter::priority, NettyFilter::serverName)
                 .forEach(e -> addHandler(server, (ChannelHandler) e.getValue(),
                         "filter" + counter.incrementAndGet(), e.getKey()));
-    }
-
-    private <T extends Annotation> void checkTcpEventHandlersArePresent(final Map<String, Object> handlers,
-                                                                        final Class<T> annotationClass,
-                                                                        final Function<T, Class<?>> processedTypeGetter) {
-
-        final Optional<Object> nonHandlerBean = handlers.values().stream()
-                .filter(o -> !(o instanceof TcpEventHandler))
-                .findAny();
-
-        if (nonHandlerBean.isPresent()) {
-            throw new IllegalStateException("Bean annotated with " + annotationClass.getSimpleName() + " doesn't " +
-                    "implement TcpEventHandler: " + nonHandlerBean.get());
-        }
-
-        handlers.values().stream()
-                .filter(o -> o instanceof TcpEventHandler)
-                .map(o -> (TcpEventHandler) o)
-                .forEach(h -> {
-                    final Class<? extends TcpEventHandler> handlerClass = h.getClass();
-                    final Class<?>[] args = resolveTypeArguments(handlerClass, TcpEventHandler.class);
-
-                    final T t = findAnnotation(handlerClass, annotationClass);
-                    final Class<?> expectedClass = processedTypeGetter.apply(t);
-
-                    if ((args == null) || (args.length == 0) || !expectedClass.isAssignableFrom(args[0])) {
-                        throw new IllegalStateException(h.getClass() + " should implement TcpEventHandler<"
-                                + expectedClass.getSimpleName() + '>');
-                    }
-                });
     }
 
     private <T extends Annotation> Stream<Map.Entry<String, Object>> getHandlers(

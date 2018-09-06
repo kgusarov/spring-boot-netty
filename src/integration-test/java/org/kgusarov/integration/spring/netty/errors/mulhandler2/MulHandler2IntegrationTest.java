@@ -1,11 +1,11 @@
-package org.kgusarov.integration.spring.netty.errors.wronggen;
+package org.kgusarov.integration.spring.netty.errors.mulhandler2;
 
 import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;
 
-public class WrongGenIntegrationTest {
+public class MulHandler2IntegrationTest {
     @Test(expected = BeanCreationException.class)
     public void testThereShouldBeAnException() {
-        WrongGenApplication.main("--spring.profiles.active=errors");
+        MulHandler2Application.main("--spring.profiles.active=errors");
     }
 }

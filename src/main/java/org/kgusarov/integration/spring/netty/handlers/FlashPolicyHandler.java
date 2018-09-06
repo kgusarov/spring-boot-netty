@@ -33,7 +33,8 @@ public final class FlashPolicyHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         if (msg instanceof ByteBuf) {
             final ByteBuf message = (ByteBuf) msg;
-            final ByteBuf data = message.slice(0, requestBuffer.readableBytes());
+            final int readableBytes = requestBuffer.readableBytes();
+            final ByteBuf data = message.slice(0, readableBytes);
 
             if (data.equals(requestBuffer)) {
                 message.release();

@@ -1,4 +1,4 @@
-package org.kgusarov.integration.spring.netty.errors.wronggen;
+package org.kgusarov.integration.spring.netty.errors.nomessageparamresolver;
 
 import org.kgusarov.integration.spring.netty.configuration.EnableNettyServers;
 import org.springframework.boot.SpringApplication;
@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @EnableNettyServers
 @SpringBootApplication
-public class WrongGenApplication {
+public class NoMessageParamResolverApplication {
     public static void main(final String... args) {
-        SpringApplication.run(WrongGenApplication.class, args);
+        SpringApplication.run(NoMessageParamResolverApplication.class, args);
     }
 }

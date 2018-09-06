@@ -21,7 +21,7 @@ public @interface NettyOnDisconnect {
 
     /**
      * Get the priority of the given handler. Priority is used to determine in what order
-     * event handlers will be called when client connects to server with appropriate name
+     * event handlers will be called when client disconnects from server with appropriate name
      *
      * @return          Priority for the given handler
      */

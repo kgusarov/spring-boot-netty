@@ -22,7 +22,7 @@ abstract class AbstractMethodInvoker {
         this.sendResult = sendResult;
     }
 
-    void invokeHandler(final Channel channel, final Object[] args) {
+    final void invokeHandler(final Channel channel, final Object[] args) {
         final Object result = args.length == 0?
                 ReflectionUtils.invokeMethod(method, bean, EMPTY_ARGS) :
                 ReflectionUtils.invokeMethod(method, bean, args);
