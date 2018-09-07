@@ -14,9 +14,7 @@ import java.util.List;
 @NettyFilter(serverName = "server1", priority = 1)
 public class Decoder extends ReplayingDecoder<Object> {
     @Override
-    protected void decode(final ChannelHandlerContext ctx, final ByteBuf in,
-                          final List<Object> out) {
-
+    protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) {
         final byte b = in.readByte();
         if (b == 0) {
             out.add(in.readLong());

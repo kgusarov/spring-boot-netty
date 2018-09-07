@@ -6,5 +6,5 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 @Component
-public class HandlerMethodCallStack extends ArrayList<Method> {
+public class HandlerMethodCalls extends ArrayList<Method> {
 }

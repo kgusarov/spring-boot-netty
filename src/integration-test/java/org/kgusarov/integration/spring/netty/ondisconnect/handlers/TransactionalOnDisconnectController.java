@@ -2,8 +2,8 @@ package org.kgusarov.integration.spring.netty.ondisconnect.handlers;
 
 import org.kgusarov.integration.spring.netty.annotations.NettyController;
 import org.kgusarov.integration.spring.netty.annotations.NettyOnDisconnect;
-import org.kgusarov.integration.spring.netty.etc.CyclicWaitForProcessingToComplete;
-import org.kgusarov.integration.spring.netty.etc.HandlerMethodCallStack;
+import org.kgusarov.integration.spring.netty.etc.ProcessingCounter;
+import org.kgusarov.integration.spring.netty.etc.HandlerMethodCalls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,15 +22,15 @@ public class TransactionalOnDisconnectController {
     }
 
     @Autowired
-    private HandlerMethodCallStack handlerCallStack;
+    private HandlerMethodCalls calls;
 
     @Autowired
-    private CyclicWaitForProcessingToComplete counter;
+    private ProcessingCounter counter;
 
     @Transactional
     @NettyOnDisconnect(serverName = "server1", priority = 3)
     public void onDisconnect() {
-        handlerCallStack.add(ON_DISCONNECT);
+        calls.add(ON_DISCONNECT);
         counter.arrive();
     }
 }

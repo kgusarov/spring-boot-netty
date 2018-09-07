@@ -13,9 +13,7 @@ import java.nio.charset.Charset;
 @NettyFilter(serverName = "server1", priority = 2)
 public class Encoder extends MessageToByteEncoder<Object> {
     @Override
-    protected void encode(final ChannelHandlerContext ctx, final Object msg,
-                          final ByteBuf out) throws Exception {
-
+    protected void encode(final ChannelHandlerContext ctx, final Object msg, final ByteBuf out) {
         if (msg instanceof Long) {
             out.writeByte(0);
             out.writeLong((Long) msg);

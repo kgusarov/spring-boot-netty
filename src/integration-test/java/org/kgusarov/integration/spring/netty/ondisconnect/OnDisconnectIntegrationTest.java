@@ -4,8 +4,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kgusarov.integration.spring.netty.ServerClient;
 import org.kgusarov.integration.spring.netty.configuration.NettyServers;
-import org.kgusarov.integration.spring.netty.etc.CyclicWaitForProcessingToComplete;
-import org.kgusarov.integration.spring.netty.etc.HandlerMethodCallStack;
+import org.kgusarov.integration.spring.netty.etc.ProcessingCounter;
+import org.kgusarov.integration.spring.netty.etc.HandlerMethodCalls;
 import org.kgusarov.integration.spring.netty.ondisconnect.handlers.OnDisconnectController;
 import org.kgusarov.integration.spring.netty.ondisconnect.handlers.TransactionalOnDisconnectController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertThat;
 @SpringBootTest
 @ContextConfiguration(classes = {
         OnDisconnectApplication.class,
-        HandlerMethodCallStack.class
+        HandlerMethodCalls.class
 }, loader = SpringBootContextLoader.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class OnDisconnectIntegrationTest {
@@ -35,10 +35,10 @@ public class OnDisconnectIntegrationTest {
     private NettyServers servers;
 
     @Autowired
-    private HandlerMethodCallStack handlerCallStack;
+    private HandlerMethodCalls calls;
 
     @Autowired
-    private CyclicWaitForProcessingToComplete counter;
+    private ProcessingCounter counter;
 
     @Test
     @DirtiesContext
@@ -55,7 +55,7 @@ public class OnDisconnectIntegrationTest {
         doDisconnectCycle(client, 0);
         doDisconnectCycle(client, 1);
 
-        assertThat(handlerCallStack, contains(
+        assertThat(calls, contains(
                 is(OnDisconnectController.ON_DISCONNECT1),
                 is(OnDisconnectController.ON_DISCONNECT2),
                 is(TransactionalOnDisconnectController.ON_DISCONNECT),

@@ -6,8 +6,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.kgusarov.integration.spring.netty.annotations.NettyController;
 import org.kgusarov.integration.spring.netty.annotations.NettyOnConnect;
-import org.kgusarov.integration.spring.netty.etc.CyclicWaitForProcessingToComplete;
-import org.kgusarov.integration.spring.netty.etc.HandlerMethodCallStack;
+import org.kgusarov.integration.spring.netty.etc.ProcessingCounter;
+import org.kgusarov.integration.spring.netty.etc.HandlerMethodCalls;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Method;
@@ -28,14 +28,14 @@ public class OnConnectController {
     }
 
     @Autowired
-    private HandlerMethodCallStack handlerCallStack;
+    private HandlerMethodCalls calls;
 
     @Autowired
-    private CyclicWaitForProcessingToComplete counter;
+    private ProcessingCounter counter;
 
     @NettyOnConnect(serverName = "server1", priority = 1)
     private void onConnect1(final ChannelHandlerContext ctx, final Channel channel) {
-        handlerCallStack.add(ON_CONNECT1);
+        calls.add(ON_CONNECT1);
         counter.arrive();
 
         final ByteBuf r1 = Unpooled.copyLong(92L);
@@ -48,7 +48,7 @@ public class OnConnectController {
     @SuppressWarnings("WeakerAccess")
     @NettyOnConnect(serverName = "server1", priority = 2)
     ByteBuf onConnect2() {
-        handlerCallStack.add(ON_CONNECT2);
+        calls.add(ON_CONNECT2);
         counter.arrive();
         return Unpooled.copyLong(106L);
     }

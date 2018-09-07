@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.Phaser;
 
 @Component
-public class CyclicWaitForProcessingToComplete extends Phaser {
-    public CyclicWaitForProcessingToComplete(final int count) {
+public class ProcessingCounter extends Phaser {
+    public ProcessingCounter(final int count) {
         super(count);
     }
 }

@@ -1,7 +1,7 @@
 package org.kgusarov.integration.spring.netty.onconnect;
 
 import org.kgusarov.integration.spring.netty.configuration.EnableNettyServers;
-import org.kgusarov.integration.spring.netty.etc.CyclicWaitForProcessingToComplete;
+import org.kgusarov.integration.spring.netty.etc.ProcessingCounter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +14,7 @@ public class OnConnectApplication {
     }
 
     @Bean
-    public CyclicWaitForProcessingToComplete counter() {
-        return new CyclicWaitForProcessingToComplete(3);
+    public ProcessingCounter counter() {
+        return new ProcessingCounter(3);
     }
 }

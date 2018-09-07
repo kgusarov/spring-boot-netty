@@ -1,18 +1,18 @@
 package org.kgusarov.integration.spring.netty.support.invoke;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.kgusarov.integration.spring.netty.annotations.NettyOnConnect;
 import org.kgusarov.integration.spring.netty.support.resolvers.NettyOnConnectParameterResolver;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.function.Function;
 
 /**
- * Internal API: invocation support for {@link org.kgusarov.integration.spring.netty.annotations.NettyOnConnect}
+ * Internal API: invocation support for {@link NettyOnConnect}
  */
-@SuppressWarnings("Guava")
 public final class OnConnectMethodInvoker extends AbstractMethodInvoker {
     private final List<NettyOnConnectParameterResolver> parameterResolvers;
 
@@ -25,11 +25,12 @@ public final class OnConnectMethodInvoker extends AbstractMethodInvoker {
     }
 
     public void channelActive(final ChannelHandlerContext ctx) {
-        final Function<NettyOnConnectParameterResolver, Object> fn = pr -> pr.resolve(ctx);
-
-        @SuppressWarnings("StaticPseudoFunctionalStyleMethod")
-        final Object[] args = Lists.transform(parameterResolvers, fn).toArray();
+        final Function<NettyOnConnectParameterResolver, @Nullable Object> fn = pr -> pr.resolve(ctx);
+        final Object[] args = parameterResolvers.stream()
+                .map(fn)
+                .toArray();
         final Channel channel = ctx.channel();
+
         invokeHandler(channel, args);
     }
 }

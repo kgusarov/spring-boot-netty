@@ -6,8 +6,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.kgusarov.integration.spring.netty.annotations.NettyController;
 import org.kgusarov.integration.spring.netty.annotations.NettyOnDisconnect;
-import org.kgusarov.integration.spring.netty.etc.CyclicWaitForProcessingToComplete;
-import org.kgusarov.integration.spring.netty.etc.HandlerMethodCallStack;
+import org.kgusarov.integration.spring.netty.etc.ProcessingCounter;
+import org.kgusarov.integration.spring.netty.etc.HandlerMethodCalls;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Method;
@@ -28,14 +28,14 @@ public class OnDisconnectController {
     }
 
     @Autowired
-    private HandlerMethodCallStack handlerCallStack;
+    private HandlerMethodCalls calls;
 
     @Autowired
-    private CyclicWaitForProcessingToComplete counter;
+    private ProcessingCounter counter;
 
     @NettyOnDisconnect(serverName = "server1", priority = 1)
     private void onDisconnect1(final ChannelFuture future, final Channel channel) {
-        handlerCallStack.add(ON_DISCONNECT1);
+        calls.add(ON_DISCONNECT1);
         counter.arrive();
 
         final ByteBuf r1 = Unpooled.copyLong(92L);
@@ -51,7 +51,7 @@ public class OnDisconnectController {
     @SuppressWarnings("WeakerAccess")
     @NettyOnDisconnect(serverName = "server1", priority = 2)
     ByteBuf onDisconnect2() {
-        handlerCallStack.add(ON_DISCONNECT2);
+        calls.add(ON_DISCONNECT2);
         counter.arrive();
         return Unpooled.copyLong(106L);
     }

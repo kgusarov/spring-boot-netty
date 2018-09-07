@@ -7,8 +7,8 @@ import org.junit.runner.RunWith;
 import org.kgusarov.integration.spring.netty.ServerClient;
 import org.kgusarov.integration.spring.netty.configuration.NettyServers;
 import org.kgusarov.integration.spring.netty.etc.ClientHandler;
-import org.kgusarov.integration.spring.netty.etc.CyclicWaitForProcessingToComplete;
-import org.kgusarov.integration.spring.netty.etc.HandlerMethodCallStack;
+import org.kgusarov.integration.spring.netty.etc.ProcessingCounter;
+import org.kgusarov.integration.spring.netty.etc.HandlerMethodCalls;
 import org.kgusarov.integration.spring.netty.onconnect.handlers.OnConnectController;
 import org.kgusarov.integration.spring.netty.onconnect.handlers.TransactionalOnConnectController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertThat;
 @SpringBootTest
 @ContextConfiguration(classes = {
         OnConnectApplication.class,
-        HandlerMethodCallStack.class
+        HandlerMethodCalls.class
 }, loader = SpringBootContextLoader.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class OnConnectIntegrationTest {
@@ -39,10 +39,10 @@ public class OnConnectIntegrationTest {
     private NettyServers servers;
 
     @Autowired
-    private HandlerMethodCallStack handlerCallStack;
+    private HandlerMethodCalls calls;
 
     @Autowired
-    private CyclicWaitForProcessingToComplete counter;
+    private ProcessingCounter counter;
 
     @Test
     @DirtiesContext
@@ -67,7 +67,7 @@ public class OnConnectIntegrationTest {
         doConnectionCycle(r1, r2, r3, client, 0);
         doConnectionCycle(r4, r5, r6, client, 1);
 
-        assertThat(handlerCallStack, contains(
+        assertThat(calls, contains(
                 is(OnConnectController.ON_CONNECT1),
                 is(OnConnectController.ON_CONNECT2),
                 is(TransactionalOnConnectController.ON_CONNECT),
