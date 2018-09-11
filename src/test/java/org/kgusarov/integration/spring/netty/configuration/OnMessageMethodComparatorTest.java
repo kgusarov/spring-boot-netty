@@ -32,7 +32,7 @@ public class OnMessageMethodComparatorTest {
 
     @Test
     public void methodSorting() {
-        final SortedSet<Method> methods = new TreeSet<>(NettyControllerConfiguration.ON_MESSAGE_METHOD_COMPARATOR);
+        final SortedSet<Method> methods = new TreeSet<>(SpringNettyConfiguration.ON_MESSAGE_METHOD_COMPARATOR);
         methods.add(THIRD_METHOD);
         methods.add(SECOND_METHOD);
         methods.add(FIRST_METHOD);
@@ -43,14 +43,14 @@ public class OnMessageMethodComparatorTest {
     @Test(expected = IllegalStateException.class)
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     public void nonAnnotatedMethodSorting() {
-        final SortedSet<Method> methods = new TreeSet<>(NettyControllerConfiguration.ON_MESSAGE_METHOD_COMPARATOR);
+        final SortedSet<Method> methods = new TreeSet<>(SpringNettyConfiguration.ON_MESSAGE_METHOD_COMPARATOR);
         methods.add(NON_ANNOTATED_METHOD);
     }
 
     @Test(expected = IllegalStateException.class)
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     public void wrongAnnotationMethodSorting() {
-        final SortedSet<Method> methods = new TreeSet<>(NettyControllerConfiguration.ON_MESSAGE_METHOD_COMPARATOR);
+        final SortedSet<Method> methods = new TreeSet<>(SpringNettyConfiguration.ON_MESSAGE_METHOD_COMPARATOR);
         methods.add(WRONG_ANNOTATION_METHOD);
     }
 

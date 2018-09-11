@@ -1,11 +1,11 @@
-package org.kgusarov.integration.spring.netty.errors.nonsharable;
+package org.kgusarov.integration.spring.netty.errors.nonsharable2;
 
 import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;
 
-public class NonSharableIntegrationTest {
+public class NonSharable2IntegrationTest {
     @Test(expected = BeanCreationException.class)
     public void testThereShouldBeAnException() {
-        NonSharableApplication.main("--spring.profiles.active=errors");
+        NonSharable2Application.main("--spring.profiles.active=errors");
     }
 }

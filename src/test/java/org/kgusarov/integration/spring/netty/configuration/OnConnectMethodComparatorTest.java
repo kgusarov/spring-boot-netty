@@ -1,11 +1,8 @@
 package org.kgusarov.integration.spring.netty.configuration;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.kgusarov.integration.spring.netty.annotations.NettyOnConnect;
 import org.kgusarov.integration.spring.netty.annotations.NettyOnDisconnect;
-import org.kgusarov.integration.spring.netty.onconnect.handlers.OnConnectController;
 
 import java.lang.reflect.Method;
 import java.util.SortedSet;
@@ -35,7 +32,7 @@ public class OnConnectMethodComparatorTest {
 
     @Test
     public void methodSorting() {
-        final SortedSet<Method> methods = new TreeSet<>(NettyControllerConfiguration.ON_CONNECT_METHOD_COMPARATOR);
+        final SortedSet<Method> methods = new TreeSet<>(SpringNettyConfiguration.ON_CONNECT_METHOD_COMPARATOR);
         methods.add(THIRD_METHOD);
         methods.add(SECOND_METHOD);
         methods.add(FIRST_METHOD);
@@ -46,14 +43,14 @@ public class OnConnectMethodComparatorTest {
     @Test(expected = IllegalStateException.class)
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     public void nonAnnotatedMethodSorting() {
-        final SortedSet<Method> methods = new TreeSet<>(NettyControllerConfiguration.ON_CONNECT_METHOD_COMPARATOR);
+        final SortedSet<Method> methods = new TreeSet<>(SpringNettyConfiguration.ON_CONNECT_METHOD_COMPARATOR);
         methods.add(NON_ANNOTATED_METHOD);
     }
 
     @Test(expected = IllegalStateException.class)
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     public void wrongAnnotationMethodSorting() {
-        final SortedSet<Method> methods = new TreeSet<>(NettyControllerConfiguration.ON_CONNECT_METHOD_COMPARATOR);
+        final SortedSet<Method> methods = new TreeSet<>(SpringNettyConfiguration.ON_CONNECT_METHOD_COMPARATOR);
         methods.add(WRONG_ANNOTATION_METHOD);
     }
 

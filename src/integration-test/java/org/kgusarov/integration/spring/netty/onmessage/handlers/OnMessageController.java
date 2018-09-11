@@ -39,7 +39,7 @@ public class OnMessageController {
 
     @NettyOnMessage(serverName = "server1", priority = 1)
     public String onStringMessage(@NettyMessageBody final String msg) {
-        calls.add(ON_MESSAGE3);
+        calls.add(ON_STRING_MESSAGE);
         counter.arrive();
 
         return msg;
@@ -61,11 +61,10 @@ public class OnMessageController {
 
     @NettyOnMessage(serverName = "server1", priority = 2)
     void onMessage1(final ChannelHandlerContext ctx, final Channel channel, @NettyMessageBody final Long msg) {
-
         calls.add(ON_MESSAGE1);
         counter.arrive();
 
-        ctx.writeAndFlush(msg);
-        channel.writeAndFlush(msg);
+        ctx.writeAndFlush(msg + 1);
+        channel.writeAndFlush(msg + 2);
     }
 }

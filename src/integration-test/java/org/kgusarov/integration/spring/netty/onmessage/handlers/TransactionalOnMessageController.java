@@ -13,11 +13,11 @@ import java.lang.reflect.Method;
 
 @NettyController
 public class TransactionalOnMessageController {
-    public static final Method ON_MESSAGE;
+    public static final Method TRANSACTIONAL_ON_MESSAGE;
 
     static {
         try {
-            ON_MESSAGE = TransactionalOnMessageController.class.getDeclaredMethod("onMessage",
+            TRANSACTIONAL_ON_MESSAGE = TransactionalOnMessageController.class.getDeclaredMethod("onMessage",
                     ChannelHandlerContext.class, Channel.class);
         } catch (final NoSuchMethodException ignored) {
             throw new IllegalStateException();
@@ -33,7 +33,7 @@ public class TransactionalOnMessageController {
     @Transactional
     @NettyOnMessage(serverName = "server1", priority = 5)
     public void onMessage(final ChannelHandlerContext ctx, final Channel channel) {
-        calls.add(ON_MESSAGE);
+        calls.add(TRANSACTIONAL_ON_MESSAGE);
         counter.arrive();
 
         ctx.writeAndFlush(889L);

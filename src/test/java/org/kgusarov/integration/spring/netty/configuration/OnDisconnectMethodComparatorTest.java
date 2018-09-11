@@ -32,7 +32,7 @@ public class OnDisconnectMethodComparatorTest {
 
     @Test
     public void methodSorting() {
-        final SortedSet<Method> methods = new TreeSet<>(NettyControllerConfiguration.ON_DISCONNECT_METHOD_COMPARATOR);
+        final SortedSet<Method> methods = new TreeSet<>(SpringNettyConfiguration.ON_DISCONNECT_METHOD_COMPARATOR);
         methods.add(THIRD_METHOD);
         methods.add(SECOND_METHOD);
         methods.add(FIRST_METHOD);
@@ -43,14 +43,14 @@ public class OnDisconnectMethodComparatorTest {
     @Test(expected = IllegalStateException.class)
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     public void nonAnnotatedMethodSorting() {
-        final SortedSet<Method> methods = new TreeSet<>(NettyControllerConfiguration.ON_DISCONNECT_METHOD_COMPARATOR);
+        final SortedSet<Method> methods = new TreeSet<>(SpringNettyConfiguration.ON_DISCONNECT_METHOD_COMPARATOR);
         methods.add(NON_ANNOTATED_METHOD);
     }
 
     @Test(expected = IllegalStateException.class)
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     public void wrongAnnotationMethodSorting() {
-        final SortedSet<Method> methods = new TreeSet<>(NettyControllerConfiguration.ON_DISCONNECT_METHOD_COMPARATOR);
+        final SortedSet<Method> methods = new TreeSet<>(SpringNettyConfiguration.ON_DISCONNECT_METHOD_COMPARATOR);
         methods.add(WRONG_ANNOTATION_METHOD);
     }
 

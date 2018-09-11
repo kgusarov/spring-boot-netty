@@ -11,6 +11,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import(NettyControllerConfiguration.class)
+@Import(SpringNettyConfiguration.class)
 public @interface EnableNettyServers {
 }

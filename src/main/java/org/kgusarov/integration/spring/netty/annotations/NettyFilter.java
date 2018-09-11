@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 
 /**
  * This annotation can be used to mark so called "Filters" - handlers that will be
- * invoked before any {@code org.kgusarov.integration.spring.netty.events.TcpEventHandler}
+ * invoked before any {@link NettyController}
  * instances will start message processing or after it will be finished. So basically, handlers will
  * work in a way similar to servlet filters. This may include encoders/decoders and another
  * stuff that can be used to preprocess the message before handling it or post-process it afterwards.
