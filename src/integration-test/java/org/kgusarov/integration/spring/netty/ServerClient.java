@@ -6,11 +6,13 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.kgusarov.integration.spring.netty.etc.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.concurrent.Future;
+import java.util.stream.Stream;
 
 public class ServerClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerClient.class);
@@ -23,7 +25,10 @@ public class ServerClient {
     public ServerClient(final int port, final String host, final ChannelHandler... handlers) {
         this.port = port;
         this.host = host;
-        this.handlers = handlers;
+        this.handlers = Stream.concat(
+                Stream.of(new ExceptionHandler()),
+                Arrays.stream(handlers)
+        ).toArray(ChannelHandler[]::new);
     }
 
     public ChannelFuture writeAndFlush(final Object msg) {
