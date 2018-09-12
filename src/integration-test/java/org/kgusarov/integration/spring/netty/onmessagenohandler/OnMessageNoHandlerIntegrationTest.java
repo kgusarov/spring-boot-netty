@@ -56,7 +56,8 @@ public class OnMessageNoHandlerIntegrationTest {
     private void runTestOnce(final int phase) throws InterruptedException, TimeoutException, ExecutionException {
         calls.clear();
 
-        final ServerClient client = new ServerClient(40000, "localhost");
+        final int serverPort = servers.get(0).getBoundToPort();
+        final ServerClient client = new ServerClient(serverPort, "localhost");
 
         client.connect();
         client.writeAndFlush(Unpooled.copyLong(100500L)).syncUninterruptibly();

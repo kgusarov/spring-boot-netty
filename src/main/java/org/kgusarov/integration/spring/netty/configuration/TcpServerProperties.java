@@ -1,6 +1,7 @@
 package org.kgusarov.integration.spring.netty.configuration;
 
 import org.kgusarov.integration.spring.netty.ChannelOptions;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -15,7 +16,11 @@ public class TcpServerProperties {
 
     private Integer bossThreads;
     private Integer workerThreads;
+
+    @NestedConfigurationProperty
     private ChannelOptions options;
+
+    @NestedConfigurationProperty
     private ChannelOptions childOptions;
 
     public String getName() {

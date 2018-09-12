@@ -12,6 +12,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,6 +39,7 @@ public final class TcpServer {
 
     private EventLoopGroup bossThreadGroup;
     private EventLoopGroup workerThreadGroup;
+    private int boundToPort = -1;
 
     /**
      * Create TCP server instance of the given name
@@ -46,6 +48,15 @@ public final class TcpServer {
      */
     public TcpServer(final String name) {
         this.name = name;
+    }
+
+    /**
+     * Get the port this server is bound to
+     *
+     * @return Port server is currently bound to, {@code -1} if not bound
+     */
+    public int getBoundToPort() {
+        return boundToPort;
     }
 
     /**
@@ -106,7 +117,7 @@ public final class TcpServer {
      * Stops the current server
      */
     void stop() {
-        LOGGER.info("Stopping Netty server @{}:{}", host, port);
+        LOGGER.info("Stopping Netty `{}`", name);
 
         workerThreadGroup.shutdownGracefully();
         bossThreadGroup.shutdownGracefully();
@@ -156,8 +167,8 @@ public final class TcpServer {
             }
         }
 
-        LOGGER.info("Starting Netty server @{}:{} with {} boss threads and {} worker threads",
-                host, port, bossThreads, workerThreads);
+        LOGGER.info("Starting Netty server `{}` with {} boss threads and {} worker threads",
+                name, bossThreads, workerThreads);
 
         final SettableFuture<Void> result = SettableFuture.create();
         final ServerBootstrap serverBootstrap = checkState().createServerBootstrap();
@@ -167,6 +178,12 @@ public final class TcpServer {
                 .channel();
 
         new Thread(() -> {
+            final InetSocketAddress boundTo = (InetSocketAddress) ch.localAddress();
+            final String hostName = boundTo.getAddress().getHostName();
+
+            boundToPort = boundTo.getPort();
+            LOGGER.info("Started Netty server `{}` @{}:{}", name, hostName, boundToPort);
+
             result.set(null);
             ch.closeFuture().syncUninterruptibly();
         }, name).start();

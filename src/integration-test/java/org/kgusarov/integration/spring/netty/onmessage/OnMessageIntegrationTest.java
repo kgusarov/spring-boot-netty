@@ -72,8 +72,10 @@ public class OnMessageIntegrationTest {
         final SettableFuture<Object> l889Future2 = SettableFuture.create();
         final SettableFuture<Object> l26576374Future2 = SettableFuture.create();
 
+        final int serverPort = servers.get(0).getBoundToPort();
+
         final ServerClient client = new ServerClient(
-                40000,
+                serverPort,
                 "localhost",
                 new Decoder(),
                 new Encoder(),

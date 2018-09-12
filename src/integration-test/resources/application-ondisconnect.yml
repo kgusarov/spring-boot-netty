@@ -7,5 +7,3 @@ netty:
       workerThreads: 4
       options:
         soReuseAddr: true
-      childOptions:
-        tcpNodelay: true

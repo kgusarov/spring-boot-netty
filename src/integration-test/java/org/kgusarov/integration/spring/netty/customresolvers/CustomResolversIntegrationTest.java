@@ -60,10 +60,12 @@ public class CustomResolversIntegrationTest {
         final SettableFuture<Long> firstRN = SettableFuture.create();
         final SettableFuture<Long> secondRN = SettableFuture.create();
 
+        final int serverPort = servers.get(0).getBoundToPort();
+
         rng.getGeneratedNumbers().clear();
 
         final ServerClient client = new ServerClient(
-                40000,
+                serverPort,
                 "localhost",
                 new ClientHandler(firstRN, secondRN)
         );
