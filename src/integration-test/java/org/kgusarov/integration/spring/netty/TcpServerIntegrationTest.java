@@ -196,10 +196,13 @@ public class TcpServerIntegrationTest {
         @Override
         public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
             final ByteBuf buf = (ByteBuf) msg;
-            final long i = buf.readLong();
 
-            LOGGER.info("Message from server: " + i);
-            responseHolders[currentResponse++].set(i);
+            while (buf.isReadable(8)) {
+                final long i = buf.readLong();
+
+                LOGGER.info("Message from server: " + i);
+                responseHolders[currentResponse++].set(i);
+            }
         }
     }
 

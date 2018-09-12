@@ -96,7 +96,10 @@ public class CustomResolversIntegrationTest {
         @Override
         public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
             final ByteBuf bb = (ByteBuf) msg;
-            futures[idx++].set(bb.readLong());
+
+            while (bb.isReadable(8)) {
+                futures[idx++].set(bb.readLong());
+            }
         }
     }
 }
