@@ -18,7 +18,7 @@ apply plugin: 'net.researchgate.release'
 apply plugin: 'com.adarshr.test-logger'
 
 group = 'org.kgusarov'
-version = '2.0.0-SNAPSHOT'
+version = "${version}"
 
 description = "Spring Boot Netty integration"
 
