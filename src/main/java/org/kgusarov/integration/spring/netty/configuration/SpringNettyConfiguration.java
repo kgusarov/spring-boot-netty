@@ -112,16 +112,16 @@ public class SpringNettyConfiguration {
             return result;
         }
 
-        final Map<String, SortedSet<Method>> connectHandlers = new HashMap<>();
-        final Map<String, SortedSet<Method>> disconnectHandlers = new HashMap<>();
-        final Map<String, SortedSet<Method>> messageHandlers = new HashMap<>();
+        final Map<String, List<Method>> connectHandlers = new HashMap<>();
+        final Map<String, List<Method>> disconnectHandlers = new HashMap<>();
+        final Map<String, List<Method>> messageHandlers = new HashMap<>();
 
         fillControllerHandlers(connectHandlers, disconnectHandlers, messageHandlers);
 
         final Map<String, Object> filters = beanFactory.getBeansWithAnnotation(NettyFilter.class);
         final BiMap<String, Object> filterBeans = HashBiMap.create(filters);
 
-        final Map<String, SortedSet<ChannelHandler>> filterHandlers = buildFilterHandlers(filters);
+        final Map<String, List<ChannelHandler>> filterHandlers = buildFilterHandlers(filters);
 
         validateConfiguration(servers, connectHandlers, disconnectHandlers, messageHandlers, filterHandlers);
 
@@ -164,8 +164,8 @@ public class SpringNettyConfiguration {
         return result;
     }
 
-    private Map<String, SortedSet<ChannelHandler>> buildFilterHandlers(final Map<String, Object> filters) {
-        final Map<String, SortedSet<ChannelHandler>> filterHandlers = new HashMap<>();
+    private Map<String, List<ChannelHandler>> buildFilterHandlers(final Map<String, Object> filters) {
+        final Map<String, List<ChannelHandler>> filterHandlers = new HashMap<>();
         filters.forEach((ignored, bean) -> {
             final Class<?> beanClass = AopProxyUtils.ultimateTargetClass(bean);
             if (!ChannelHandler.class.isAssignableFrom(beanClass)) {
@@ -175,19 +175,22 @@ public class SpringNettyConfiguration {
             final NettyFilter annotation = findAnnotation(beanClass, NettyFilter.class);
             if (annotation != null) {
                 final String serverName = annotation.serverName();
-                filterHandlers.computeIfAbsent(serverName, k -> new TreeSet<>(FILTER_BEAN_COMPARATOR))
+                filterHandlers.computeIfAbsent(serverName, k -> new ArrayList<>())
                         .add((ChannelHandler) bean);
             }
         });
+
+        //noinspection NestedMethodCall
+        filterHandlers.values().forEach(l -> l.sort(FILTER_BEAN_COMPARATOR));
 
         return filterHandlers;
     }
 
     private List<Supplier<ChannelHandler>> buildFilterSuppliers(final BiMap<String, Object> filterBeans,
-                                                        final Map<String, SortedSet<ChannelHandler>> filterHandlers,
+                                                        final Map<String, List<ChannelHandler>> filterHandlers,
                                                         final String name) {
 
-        return filterHandlers.getOrDefault(name, new TreeSet<>())
+        return filterHandlers.getOrDefault(name, new ArrayList<>())
                 .stream()
                 .map(o -> {
                     final Class<?> beanClass = AopProxyUtils.ultimateTargetClass(o);
@@ -243,9 +246,9 @@ public class SpringNettyConfiguration {
         return server;
     }
 
-    private void fillControllerHandlers(final Map<String, SortedSet<Method>> connectHandlers,
-                                        final Map<String, SortedSet<Method>> disconnectHandlers,
-                                        final Map<String, SortedSet<Method>> messageHandlers) {
+    private void fillControllerHandlers(final Map<String, List<Method>> connectHandlers,
+                                        final Map<String, List<Method>> disconnectHandlers,
+                                        final Map<String, List<Method>> messageHandlers) {
 
         final Map<String, Object> controllers = beanFactory.getBeansWithAnnotation(NettyController.class);
         controllers.forEach((ignored, bean) -> {
@@ -270,12 +273,21 @@ public class SpringNettyConfiguration {
                 }
             }
         });
+
+        //noinspection NestedMethodCall
+        connectHandlers.values().forEach(l -> l.sort(ON_CONNECT_METHOD_COMPARATOR));
+
+        //noinspection NestedMethodCall
+        disconnectHandlers.values().forEach(l -> l.sort(ON_DISCONNECT_METHOD_COMPARATOR));
+
+        //noinspection NestedMethodCall
+        messageHandlers.values().forEach(l -> l.sort(ON_MESSAGE_METHOD_COMPARATOR));
     }
 
-    private List<OnDisconnectMethodInvoker> buildDisconnectMethodInvokers(final String serverName, final Map<String, SortedSet<Method>> disconnectHandlers,
+    private List<OnDisconnectMethodInvoker> buildDisconnectMethodInvokers(final String serverName, final Map<String, List<Method>> disconnectHandlers,
                                                                           final Collection<NettyOnDisconnectParameterResolver> disconnectParameterResolvers) {
 
-        final SortedSet<Method> onDisconnect = disconnectHandlers.getOrDefault(serverName, new TreeSet<>());
+        final List<Method> onDisconnect = disconnectHandlers.getOrDefault(serverName, new ArrayList<>());
         final List<OnDisconnectMethodInvoker> result = new ArrayList<>();
         for (final Method method : onDisconnect) {
             final List<NettyOnDisconnectParameterResolver> resolvers =
@@ -292,10 +304,10 @@ public class SpringNettyConfiguration {
         return result;
     }
 
-    private List<OnMessageMethodInvoker> buildMessageMethodInvokers(final String serverName, final Map<String, SortedSet<Method>> messageHandlers,
+    private List<OnMessageMethodInvoker> buildMessageMethodInvokers(final String serverName, final Map<String, List<Method>> messageHandlers,
                                                                     final Collection<NettyOnMessageParameterResolver> messageParameterResolvers) {
 
-        final SortedSet<Method> onMessage = messageHandlers.getOrDefault(serverName, new TreeSet<>());
+        final List<Method> onMessage = messageHandlers.getOrDefault(serverName, new ArrayList<>());
         final List<OnMessageMethodInvoker> result = new ArrayList<>();
         for (final Method method : onMessage) {
             final List<NettyOnMessageParameterResolver> resolvers = buildMethodParameterResolvers(method, messageParameterResolvers);
@@ -313,10 +325,10 @@ public class SpringNettyConfiguration {
         return result;
     }
 
-    private List<OnConnectMethodInvoker> buildConnectMethodInvokers(final String serverName, final Map<String, SortedSet<Method>> connectHandlers,
+    private List<OnConnectMethodInvoker> buildConnectMethodInvokers(final String serverName, final Map<String, List<Method>> connectHandlers,
                                                                     final Collection<NettyOnConnectParameterResolver> connectParameterResolvers) {
 
-        final SortedSet<Method> onConnect = connectHandlers.getOrDefault(serverName, new TreeSet<>());
+        final List<Method> onConnect = connectHandlers.getOrDefault(serverName, new ArrayList<>());
         final List<OnConnectMethodInvoker> result = new ArrayList<>();
         for (final Method method : onConnect) {
             final List<NettyOnConnectParameterResolver> resolvers = buildMethodParameterResolvers(method, connectParameterResolvers);
@@ -352,11 +364,11 @@ public class SpringNettyConfiguration {
                 .orElseThrow(() -> new IllegalStateException("Unable to find resolver for " + methodParameter));
     }
 
-    private static boolean checkForConnectHandler(final Map<String, SortedSet<Method>> connectHandlers, final Method method) {
+    private static boolean checkForConnectHandler(final Map<String, List<Method>> connectHandlers, final Method method) {
         final NettyOnConnect annotation = findAnnotation(method, NettyOnConnect.class);
         if (annotation != null) {
             final String serverName = annotation.serverName();
-            connectHandlers.computeIfAbsent(serverName, k -> new TreeSet<>(ON_CONNECT_METHOD_COMPARATOR))
+            connectHandlers.computeIfAbsent(serverName, k -> new ArrayList<>())
                     .add(method);
 
             return true;
@@ -365,11 +377,11 @@ public class SpringNettyConfiguration {
         return false;
     }
 
-    private static boolean checkForDisconnectHandler(final Map<String, SortedSet<Method>> disconnectHandlers, final Method method) {
+    private static boolean checkForDisconnectHandler(final Map<String, List<Method>> disconnectHandlers, final Method method) {
         final NettyOnDisconnect annotation = findAnnotation(method, NettyOnDisconnect.class);
         if (annotation != null) {
             final String serverName = annotation.serverName();
-            disconnectHandlers.computeIfAbsent(serverName, k -> new TreeSet<>(ON_DISCONNECT_METHOD_COMPARATOR))
+            disconnectHandlers.computeIfAbsent(serverName, k -> new ArrayList<>())
                     .add(method);
 
             return true;
@@ -378,11 +390,11 @@ public class SpringNettyConfiguration {
         return false;
     }
 
-    private static boolean checkForMessageHandler(final Map<String, SortedSet<Method>> messageHandlers, final Method method) {
+    private static boolean checkForMessageHandler(final Map<String, List<Method>> messageHandlers, final Method method) {
         final NettyOnMessage annotation = findAnnotation(method, NettyOnMessage.class);
         if (annotation != null) {
             final String serverName = annotation.serverName();
-            messageHandlers.computeIfAbsent(serverName, k -> new TreeSet<>(ON_MESSAGE_METHOD_COMPARATOR))
+            messageHandlers.computeIfAbsent(serverName, k -> new ArrayList<>())
                     .add(method);
 
             return true;
@@ -392,10 +404,10 @@ public class SpringNettyConfiguration {
     }
 
     private static void validateConfiguration(final List<TcpServerProperties> servers,
-                                              final Map<String, SortedSet<Method>> connectHandlers,
-                                              final Map<String, SortedSet<Method>> disconnectHandlers,
-                                              final Map<String, SortedSet<Method>> messageHandlers,
-                                              final Map<String, SortedSet<ChannelHandler>> filterHandlers) {
+                                              final Map<String, List<Method>> connectHandlers,
+                                              final Map<String, List<Method>> disconnectHandlers,
+                                              final Map<String, List<Method>> messageHandlers,
+                                              final Map<String, List<ChannelHandler>> filterHandlers) {
 
         final Set<String> serversInConfig = servers.stream()
                 .map(TcpServerProperties::getName)

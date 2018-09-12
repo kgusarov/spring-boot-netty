@@ -50,6 +50,10 @@ public final class OnMessageMethodInvoker extends AbstractMethodInvoker {
                 .orElse(null);
     }
 
+    public Class<?> getMessageBodyType() {
+        return messageBodyType;
+    }
+
     @SuppressWarnings("NestedMethodCall")
     public boolean channelRead(final ChannelHandlerContext ctx, final Object msg) {
         if ((messageBodyType != null) && !messageBodyType.isAssignableFrom(msg.getClass())) {
@@ -62,7 +66,6 @@ public final class OnMessageMethodInvoker extends AbstractMethodInvoker {
                 .toArray();
 
         final Channel channel = ctx.channel();
-
         invokeHandler(channel, args);
         return true;
     }
