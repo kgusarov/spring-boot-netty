@@ -7,6 +7,10 @@ jdk:
   - openjdk9
   - openjdk10
 
+branches:
+  only:
+  - master
+
 notifications:
   email:
     - konstantins.gusarovs@gmail.com

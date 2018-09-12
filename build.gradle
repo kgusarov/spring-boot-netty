@@ -7,6 +7,7 @@ buildscript {
 
     dependencies {
         classpath 'net.researchgate:gradle-release:2.6.0'
+        classpath 'com.adarshr:gradle-test-logger-plugin:1.5.0'
     }
 }
 
@@ -14,6 +15,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'jacoco'
 apply plugin: 'net.researchgate.release'
+apply plugin: 'com.adarshr.test-logger'
 
 group = 'org.kgusarov'
 version = '2.0.0-SNAPSHOT'
@@ -24,11 +26,21 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 test {
-    testLogging {
-        events = ["passed", "failed", "skipped"]
-        showStandardStreams = true
-        exceptionFormat = 'full'
-    }
+    failFast true
+    maxParallelForks 1
+}
+
+testlogger {
+    theme 'mocha'
+
+    showSummary true
+    showStandardStreams true
+    showPassedStandardStreams false
+    showSkippedStandardStreams false
+    showFailedStandardStreams true
+    showPassed false
+    showSkipped false
+    showFailed true
 }
 
 release {

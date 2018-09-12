@@ -1,5 +1,6 @@
 package org.kgusarov.integration.spring.netty;
 
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.netty.buffer.Unpooled.copyLong;
@@ -49,13 +51,13 @@ public class TcpServerIntegrationTest {
     @Test
     public void testServerStarts() throws Exception {
         final Future<Void> startFuture = tcpServer.start();
-        startFuture.get();
+        startFuture.get(30, TimeUnit.SECONDS);
     }
 
     @Test(expected = IllegalStateException.class)
     public void testOnceServerIsStartedItCannotBeReconfigured() throws Exception {
         final Future<Void> startFuture = tcpServer.start();
-        startFuture.get();
+        startFuture.get(30, TimeUnit.SECONDS);
 
         tcpServer.setPort(12345);
     }
@@ -63,7 +65,7 @@ public class TcpServerIntegrationTest {
     @Test(expected = IllegalStateException.class)
     public void testOnceServerIsStartedNextStartAttemptWillFail() throws Exception {
         final Future<Void> startFuture = tcpServer.start();
-        startFuture.get();
+        startFuture.get(30, TimeUnit.SECONDS);
 
         tcpServer.start();
     }
@@ -75,10 +77,10 @@ public class TcpServerIntegrationTest {
         final ServerClient client = new ServerClient(40000, "localhost");
 
         tcpServer.onConnect(() -> onConnect);
-        tcpServer.start().get();
+        tcpServer.start().get(30, TimeUnit.SECONDS);
 
-        client.connect().get().disconnect();
-        client.connect().get().disconnect();
+        client.connect().get(30, TimeUnit.SECONDS).disconnect();
+        client.connect().get(30, TimeUnit.SECONDS).disconnect();
 
         tcpServer.stop();
         assertEquals(2, connections.get());
@@ -93,9 +95,9 @@ public class TcpServerIntegrationTest {
 
         tcpServer.onConnect(() -> onConnect1);
         tcpServer.onConnect(() -> onConnect2);
-        tcpServer.start().get();
+        tcpServer.start().get(30, TimeUnit.SECONDS);
 
-        client.connect().get().disconnect();
+        client.connect().get(30, TimeUnit.SECONDS).disconnect();
 
         tcpServer.stop();
         assertEquals(2, connections.get());
@@ -108,10 +110,10 @@ public class TcpServerIntegrationTest {
         final ServerClient client = new ServerClient(40000, "localhost");
 
         tcpServer.onDisconnect(() -> onDisconnectHandler);
-        tcpServer.start().get();
+        tcpServer.start().get(30, TimeUnit.SECONDS);
 
-        client.connect().get().disconnect();
-        client.connect().get().disconnect();
+        client.connect().get(30, TimeUnit.SECONDS).disconnect();
+        client.connect().get(30, TimeUnit.SECONDS).disconnect();
 
         tcpServer.stop();
         assertEquals(2, disconnects.get());
@@ -120,18 +122,18 @@ public class TcpServerIntegrationTest {
     @Test
     public void testHandlersWork() throws Exception {
         tcpServer.addHandler("echoHandler", EchoServerHandler::new);
-        tcpServer.start().get();
+        tcpServer.start().get(30, TimeUnit.SECONDS);
 
         final SettableFuture<Long> responseHolder = SettableFuture.create();
         final ServerClient client = new ServerClient(40000, "localhost",
                 new EchoClientHandler(responseHolder));
 
-        client.connect().get();
+        client.connect().get(30, TimeUnit.SECONDS);
 
         final ByteBuf msg = copyLong(1L);
         client.writeAndFlush(msg).syncUninterruptibly();
 
-        final long actual = responseHolder.get();
+        final long actual = responseHolder.get(30, TimeUnit.SECONDS);
         assertEquals(1L, actual);
 
         client.disconnect();
@@ -143,22 +145,24 @@ public class TcpServerIntegrationTest {
         tcpServer.addHandler("echoDecoder", EchoServerDecoder::new);
         tcpServer.addHandler("echoEncoder", EchoServerEncoder::new);
         tcpServer.addHandler("echoHandler", EchoServerHandler::new);
-        tcpServer.start().get();
+        tcpServer.start().get(30, TimeUnit.SECONDS);
 
         final SettableFuture<Long> responseHolder1 = SettableFuture.create();
         final SettableFuture<Long> responseHolder2 = SettableFuture.create();
         final ServerClient client = new ServerClient(40000, "localhost",
                 new EchoClientHandler(responseHolder1, responseHolder2));
 
-        client.connect().get();
+        client.connect().get(30, TimeUnit.SECONDS);
 
         final ByteBuf msg1 = copyLong(1L);
         final ByteBuf msg2 = copyLong(2L);
         client.writeAndFlush(msg1).syncUninterruptibly();
         client.writeAndFlush(msg2).syncUninterruptibly();
 
-        final long actual1 = responseHolder1.get();
-        final long actual2 = responseHolder2.get();
+        Futures.successfulAsList(responseHolder1, responseHolder2).get(30, TimeUnit.SECONDS);
+
+        final long actual1 = responseHolder1.get(30, TimeUnit.SECONDS);
+        final long actual2 = responseHolder2.get(30, TimeUnit.SECONDS);
         assertEquals(1L, actual1);
         assertEquals(2L, actual2);
 
