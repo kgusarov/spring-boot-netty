@@ -1,7 +1,7 @@
 package org.kgusarov.integration.spring.netty.onmessage;
 
 import org.kgusarov.integration.spring.netty.configuration.EnableNettyServers;
-import org.kgusarov.integration.spring.netty.etc.WaitForProcessingToComplete;
+import org.kgusarov.integration.spring.netty.etc.ProcessingCounter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +14,7 @@ public class OnMessageApplication {
     }
 
     @Bean
-    public WaitForProcessingToComplete waitForProcessingToComplete() {
-        return new WaitForProcessingToComplete(4);
+    public ProcessingCounter counter() {
+        return new ProcessingCounter(5);
     }
 }

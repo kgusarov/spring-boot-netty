@@ -2,4 +2,6 @@ netty:
   servers:
     - name: server1
       host: localhost
-      port: 40000
+      port: 40006
+      options:
+        soReuseAddr: true

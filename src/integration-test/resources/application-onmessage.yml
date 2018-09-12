@@ -6,7 +6,6 @@ netty:
       bossThreads: 4
       workerThreads: 4
       options:
-        tcpNodelay: true
         soReuseAddr: true
       childOptions:
         tcpNodelay: true

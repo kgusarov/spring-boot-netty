@@ -1,6 +1,5 @@
 package org.kgusarov.integration.spring.netty.configuration;
 
-import org.kgusarov.integration.spring.netty.TcpServerLifeCycle;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -12,6 +11,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import({SpringNettyConfiguration.class, TcpServerLifeCycle.class})
+@Import(SpringNettyConfiguration.class)
 public @interface EnableNettyServers {
 }

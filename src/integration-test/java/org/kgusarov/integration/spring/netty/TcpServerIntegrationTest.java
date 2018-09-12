@@ -29,7 +29,6 @@ public class TcpServerIntegrationTest {
         childOptions.setTcpNodelay(true);
 
         final ChannelOptions options = new ChannelOptions();
-        options.setTcpNodelay(true);
         options.setSoReuseAddr(true);
 
         tcpServer = new TcpServer("test-server");

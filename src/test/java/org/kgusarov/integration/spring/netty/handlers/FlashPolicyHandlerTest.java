@@ -12,8 +12,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Arrays;
+
 import static io.netty.buffer.Unpooled.copiedBuffer;
 import static org.kgusarov.integration.spring.netty.handlers.FlashPolicyHandler.POLICY_FILE_REQUEST;
+import static org.kgusarov.integration.spring.netty.handlers.FlashPolicyHandler.POLICY_FILE_RESPONSE;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,10 +44,19 @@ public class FlashPolicyHandlerTest {
     @Test
     public void testPolicyIsSentAndConnectionIsClosed() throws Exception {
         final ByteBuf request = copiedBuffer(POLICY_FILE_REQUEST, CharsetUtil.UTF_8);
+        final ByteBuf expectedResponse = copiedBuffer(copiedBuffer(POLICY_FILE_RESPONSE, CharsetUtil.UTF_8));
         handler.channelRead(ctx, request);
 
         verifyZeroInteractions(channelPipeline);
-        verify(ctx, times(1)).writeAndFlush(any(ByteBuf.class));
+        verify(ctx, times(1)).writeAndFlush(
+                argThat(arg -> {
+                    final ByteBuf bb = (ByteBuf) arg;
+                    final byte[] bytesSent = bb.array();
+                    final byte[] bytesExpected = expectedResponse.array();
+
+                    return Arrays.equals(bytesExpected, bytesSent);
+                })
+        );
         verify(channelFuture, times(1)).addListener(ChannelFutureListener.CLOSE);
         verify(ctx, times(0)).fireChannelRead(any(ByteBuf.class));
     }

@@ -4,12 +4,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kgusarov.integration.spring.netty.ServerClient;
 import org.kgusarov.integration.spring.netty.configuration.NettyServers;
-import org.kgusarov.integration.spring.netty.etc.HandlerCallStack;
-import org.kgusarov.integration.spring.netty.etc.HandlerStack;
-import org.kgusarov.integration.spring.netty.etc.TcpEventStack;
-import org.kgusarov.integration.spring.netty.etc.WaitForProcessingToComplete;
-import org.kgusarov.integration.spring.netty.ondisconnect.handlers.OnDisconnectHandler1;
-import org.kgusarov.integration.spring.netty.ondisconnect.handlers.OnDisconnectHandler2;
+import org.kgusarov.integration.spring.netty.etc.ProcessingCounter;
+import org.kgusarov.integration.spring.netty.etc.HandlerMethodCalls;
+import org.kgusarov.integration.spring.netty.ondisconnect.handlers.OnDisconnectController;
+import org.kgusarov.integration.spring.netty.ondisconnect.handlers.TransactionalOnDisconnectController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootContextLoader;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,18 +16,18 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 @ActiveProfiles("ondisconnect")
 @SpringBootTest
 @ContextConfiguration(classes = {
         OnDisconnectApplication.class,
-        HandlerCallStack.class,
-        TcpEventStack.class,
-        HandlerStack.class
+        HandlerMethodCalls.class
 }, loader = SpringBootContextLoader.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class OnDisconnectIntegrationTest {
@@ -37,16 +35,10 @@ public class OnDisconnectIntegrationTest {
     private NettyServers servers;
 
     @Autowired
-    private HandlerCallStack handlerCallStack;
+    private HandlerMethodCalls calls;
 
     @Autowired
-    private TcpEventStack tcpEventStack;
-
-    @Autowired
-    private WaitForProcessingToComplete waitForProcessingToComplete;
-
-    @Autowired
-    private HandlerStack handlers;
+    private ProcessingCounter counter;
 
     @Test
     @DirtiesContext
@@ -56,26 +48,25 @@ public class OnDisconnectIntegrationTest {
 
     @Test
     @DirtiesContext
+    @SuppressWarnings("unchecked")
     public void testHandlersAddedInCorrectOrder() throws Exception {
         final ServerClient client = new ServerClient(40000, "localhost");
 
+        doDisconnectCycle(client, 0);
+        doDisconnectCycle(client, 1);
+
+        assertThat(calls, contains(
+                is(OnDisconnectController.ON_DISCONNECT1),
+                is(OnDisconnectController.ON_DISCONNECT2),
+                is(TransactionalOnDisconnectController.ON_DISCONNECT),
+                is(OnDisconnectController.ON_DISCONNECT1),
+                is(OnDisconnectController.ON_DISCONNECT2),
+                is(TransactionalOnDisconnectController.ON_DISCONNECT)
+        ));
+    }
+
+    private void doDisconnectCycle(final ServerClient client, final int phase) throws InterruptedException, ExecutionException, TimeoutException {
         client.connect().get().disconnect();
-        client.connect().get().disconnect();
-
-        waitForProcessingToComplete.await(30, TimeUnit.SECONDS);
-
-        assertEquals(4, handlerCallStack.size());
-        assertEquals(4, tcpEventStack.size());
-
-        assertThat(handlerCallStack.get(0), is(equalTo(OnDisconnectHandler1.class)));
-        assertThat(handlerCallStack.get(1), is(equalTo(OnDisconnectHandler2.class)));
-        assertThat(handlerCallStack.get(2), is(equalTo(OnDisconnectHandler1.class)));
-        assertThat(handlerCallStack.get(3), is(equalTo(OnDisconnectHandler2.class)));
-
-        assertEquals(tcpEventStack.get(0), tcpEventStack.get(1));
-        assertEquals(tcpEventStack.get(2), tcpEventStack.get(3));
-
-        assertNotEquals(handlers.get(0), handlers.get(2));
-        assertNotEquals(handlers.get(1), handlers.get(3));
+        counter.awaitAdvanceInterruptibly(phase, 30, TimeUnit.SECONDS);
     }
 }

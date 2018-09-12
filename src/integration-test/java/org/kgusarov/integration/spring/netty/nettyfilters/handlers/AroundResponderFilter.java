@@ -1,16 +1,14 @@
 package org.kgusarov.integration.spring.netty.nettyfilters.handlers;
 
 import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerAdapter;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import org.kgusarov.integration.spring.netty.annotations.NettyFilter;
 import org.kgusarov.integration.spring.netty.etc.HandlerCallStack;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@ChannelHandler.Sharable
 @NettyFilter(serverName = "server1", priority = 9)
 public class AroundResponderFilter extends ChannelDuplexHandler {
     @Autowired
