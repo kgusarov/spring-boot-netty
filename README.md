@@ -125,9 +125,145 @@ Study this example, or also refer to [this test](https://github.com/kgusarov/spr
 to see, which handlers in which order depending on which message are getting called. :eyeglasses:
 
 ### Custom Method Parameter Resolvers
-TODO
+As it was mentioned, when working with `@NettyController` annotated classes, it is possible to pass various parameters
+to the methods. These parameters are resolved with the help of [method parameter resolvers](https://github.com/kgusarov/spring-boot-netty/tree/master/src/main/java/org/kgusarov/integration/spring/netty/support/resolvers),
+so if you need to introduce additional parameters for your handler methods, just implement appropriate resolver and mark it
+as a Spring `@Component`. That should do the trick:
+```java
+@Component
+public class RNG extends Random {
+    private final List<Long> generatedNumbers = Lists.newArrayList();
+
+    @Override
+    public long nextLong() {
+        final long result = super.nextLong();
+        generatedNumbers.add(result);
+        return result;
+    }
+
+    public List<Long> getGeneratedNumbers() {
+        return generatedNumbers;
+    }
+}
+
+@Component
+public class RandomLongOnConnectResolver implements NettyOnConnectParameterResolver {
+    private final RNG rng;
+
+    @Autowired
+    public RandomLongOnConnectResolver(final RNG rng) {
+        this.rng = rng;
+    }
+
+    @Override
+    public Object resolve(final ChannelHandlerContext ctx) {
+        return rng.nextLong();
+    }
+
+    @Override
+    public boolean canResolve(final MethodParameter methodParameter) {
+        final Class<?> parameterType = methodParameter.getParameterType();
+        return long.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType);
+    }
+}
+
+@Component
+public class RandomLongOnDisconnectResolver implements NettyOnDisconnectParameterResolver {
+    private final RNG rng;
+
+    @Autowired
+    public RandomLongOnDisconnectResolver(final RNG rng) {
+        this.rng = rng;
+    }
+
+    @Override
+    public boolean canResolve(final MethodParameter methodParameter) {
+        final Class<?> parameterType = methodParameter.getParameterType();
+        return long.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType);
+    }
+
+    @Override
+    public Object resolve(final ChannelFuture future) {
+        return rng.nextLong();
+    }
+}
+
+@Component
+public class RandomLongOnMessageResolver implements NettyOnMessageParameterResolver {
+    private final RNG rng;
+
+    @Autowired
+    public RandomLongOnMessageResolver(final RNG rng) {
+        this.rng = rng;
+    }
+
+    @Override
+    public boolean canResolve(final MethodParameter methodParameter) {
+        final Class<?> parameterType = methodParameter.getParameterType();
+        return long.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType);
+    }
+
+    @Override
+    public Object resolve(final ChannelHandlerContext ctx, final Object msg) {
+        return rng.nextLong();
+    }
+}
+```
+Refer to [this test](https://github.com/kgusarov/spring-boot-netty/tree/master/src/integration-test/java/org/kgusarov/integration/spring/netty/customresolvers)
+for more information.
+
 ### Filters
-TODO
+The last part to be discussed, are filters. There is analogy between Netty filters marked with `@NettyFilter` annotation and
+servlet filters in Java Servlet Specification. Classes marked with this annotation will be added to Netty handler pipeline
+before any `@NettyController` classes will do the processing. Filters should implement `@ChannelHanlder` interfaces. 
+Also, filters can be stateless and stateful. Netty itself achieves this using `@ChannelHandler.Sharable` annotation. Same
+rules apply here with one additional requirement - if handler is not sharable, it should be defined in a
+`ConfigurableBeanFactory.SCOPE_PROTOTYPE` scope to ensure Spring will create new instances of this bean when required!
+So, say, you want your server to speak with client using `String` messages. Here's an example of appropriate filters
+and handlers:
+```java
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@NettyFilter(serverName = "server1", priority = 1)
+public class Decoder extends ReplayingDecoder<Object> {
+    @Override
+    protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) {
+        final int size = in.readInt();
+        final byte[] bytes = new byte[size];
+
+        in.readBytes(bytes, 0, size);
+        out.add(new String(bytes, Charset.forName("UTF-8")));
+    }
+}
+
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@NettyFilter(serverName = "server1", priority = 2)
+public class Encoder extends MessageToByteEncoder<Object> {   
+    @Override
+    protected void encode(final ChannelHandlerContext ctx, final Object msg, final ByteBuf out) {        
+        final String s = (String) msg;
+        final byte[] bytes = s.getBytes(Charset.forName("UTF-8"));
+
+        out.writeByte(1);
+        out.writeInt(bytes.length);
+        out.writeBytes(bytes);
+    }
+}
+
+
+@NettyController
+@SuppressWarnings("WeakerAccess")
+public class OnMessageController {    
+    @NettyOnMessage(serverName = "server1", priority = 1)
+    public String onMessage(@NettyMessageBody final String msg) {
+        // Do your processing here...
+    }
+}
+```
+NB! Priorities for `@NettyController` and `@NettyFilter` are used only with appropriate classes, which means first
+filters are sorted by their priority, then controllers by their.
+It is also possible to use only filters to do all the handling! Check 
+[this test](https://github.com/kgusarov/spring-boot-netty/tree/master/src/integration-test/java/org/kgusarov/integration/spring/netty/nettyfilters)
+for more information
 
 ## License
 This project is licensed under my personal favorite - MIT License. 
