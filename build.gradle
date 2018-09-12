@@ -23,6 +23,14 @@ description = "Spring Boot Netty integration"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+test {
+    testLogging {
+        events = ["passed", "failed", "skipped"]
+        showStandardStreams = true
+        exceptionFormat = 'full'
+    }
+}
+
 release {
     tagTemplate = 'v${version}'
 }
