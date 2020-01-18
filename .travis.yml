@@ -3,9 +3,15 @@ jdk:
   - oraclejdk8
   - oraclejdk9
   - oraclejdk10
+  - oraclejdk11
+  - oraclejdk12
+  - oraclejdk13
   - openjdk8
   - openjdk9
   - openjdk10
+  - openjdk11
+  - openjdk12
+  - openjdk13
 
 branches:
   only:

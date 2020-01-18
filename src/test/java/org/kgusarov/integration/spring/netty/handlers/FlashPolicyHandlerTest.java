@@ -47,7 +47,7 @@ public class FlashPolicyHandlerTest {
         final ByteBuf expectedResponse = copiedBuffer(copiedBuffer(POLICY_FILE_RESPONSE, CharsetUtil.UTF_8));
         handler.channelRead(ctx, request);
 
-        verifyZeroInteractions(channelPipeline);
+        verifyNoInteractions(channelPipeline);
         verify(ctx, times(1)).writeAndFlush(
                 argThat(arg -> {
                     final ByteBuf bb = (ByteBuf) arg;
@@ -76,7 +76,7 @@ public class FlashPolicyHandlerTest {
     public void testNonByteBufMessageIsIgnored() throws Exception {
         handler.channelRead(ctx, null);
 
-        verifyZeroInteractions(channelPipeline);
+        verifyNoInteractions(channelPipeline);
         verify(ctx, times(0)).writeAndFlush(any(ByteBuf.class));
         verify(channelFuture, times(0)).addListener(ChannelFutureListener.CLOSE);
         verify(ctx, times(1)).fireChannelRead(null);
