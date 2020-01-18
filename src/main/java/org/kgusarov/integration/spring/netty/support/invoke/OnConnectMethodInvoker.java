@@ -2,13 +2,11 @@ package org.kgusarov.integration.spring.netty.support.invoke;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.kgusarov.integration.spring.netty.annotations.NettyOnConnect;
 import org.kgusarov.integration.spring.netty.support.resolvers.NettyOnConnectParameterResolver;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Internal API: invocation support for {@link NettyOnConnect}
@@ -20,15 +18,18 @@ public final class OnConnectMethodInvoker extends AbstractMethodInvoker {
                                   final List<NettyOnConnectParameterResolver> parameterResolvers,
                                   final boolean sendResult) {
 
-        super(bean, method, sendResult);
+        super(bean, method, sendResult, parameterResolvers);
         this.parameterResolvers = parameterResolvers;
     }
 
     public void channelActive(final ChannelHandlerContext ctx) {
-        final Function<NettyOnConnectParameterResolver, @Nullable Object> fn = pr -> pr.resolve(ctx);
-        final Object[] args = parameterResolvers.stream()
-                .map(fn)
-                .toArray();
+        final List<Object> argList = buildArgList();
+        for (final NettyOnConnectParameterResolver pr : parameterResolvers) {
+            final Object arg = pr.resolve(ctx);
+            argList.add(arg);
+        }
+
+        final Object[] args = argList.toArray();
         final Channel channel = ctx.channel();
 
         invokeHandler(channel, args);
