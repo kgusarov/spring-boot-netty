@@ -13,17 +13,37 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'signing'
 apply plugin: 'jacoco'
 apply plugin: 'net.researchgate.release'
 apply plugin: 'com.adarshr.test-logger'
 
 group = 'org.kgusarov'
 version = "${version}"
+archivesBaseName = 'spring-boot-netty'
 
 description = "Spring Boot Netty integration"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
 
 test {
     failFast true
@@ -126,4 +146,50 @@ dependencies {
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: springBootVersion
     testCompile group: 'com.h2database', name: 'h2', version: h2Version
     testCompile group: 'javax.xml.bind', name: 'jaxb-api', version: jaxbApiVersion
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment {
+                MavenDeployment deployment -> signing.signPom(deployment)
+            }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Spring Boot Netty'
+                packaging 'jar'
+                description 'Spring Boot integration with Netty'
+                url 'https://github.com/kgusarov/spring-boot-netty'
+
+                scm {
+                    connection 'scm:git:https://github.com/kgusarov/spring-boot-netty.git'
+                    developerConnection 'scm:git:https://github.com/kgusarov/spring-boot-netty.git'
+                    url 'https://github.com/kgusarov/spring-boot-netty'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'http://www.opensource.org/licenses/mit-license.php'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'kgusarov'
+                        name 'Konstantin Gusarov'
+                        email 'konstantins.gusarovs@gmail.com'
+                    }
+                }
+            }
+        }
+    }
 }
