@@ -31,22 +31,24 @@ description = "Spring Boot Netty integration"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
+if (isPublishing) {
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
 
-artifacts {
-    archives javadocJar, sourcesJar
-}
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
 
-signing {
-    sign configurations.archives
+    signing {
+        sign configurations.archives
+    }
 }
 
 test {
