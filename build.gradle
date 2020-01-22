@@ -93,7 +93,7 @@ tasks.withType(JavaCompile) {
 
 def springBootVersion = '2.2.3.RELEASE'
 def slf4jVersion = '1.7.30'
-def nettyVersion = '4.1.29.Final'
+def nettyVersion = '4.1.44.Final'
 def guavaVersion = '26.0-jre'
 def javaxElVersion = '3.0.1-b10'
 def javaxElApiVersion = '3.0.1-b06'
@@ -104,6 +104,7 @@ def jaxbApiVersion = '2.3.0'
 def byteBuddyVersion = '1.10.2'
 def junitJupiterApiVersion = '5.5.2'
 def classmateVersion = '1.5.1'
+def asmVersion = '5.0.4'
 
 configurations.all {
     resolutionStrategy {
@@ -145,6 +146,7 @@ dependencies {
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: hibernateValidatorVersion
     compile group: 'javax.el', name: 'javax.el-api', version: javaxElApiVersion
     compile group: 'org.glassfish', name: 'javax.el', version: javaxElVersion
+    compile group: 'org.ow2.asm', name: 'asm', version: asmVersion
 
     annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: springBootVersion
 

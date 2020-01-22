@@ -1,4 +1,4 @@
-package org.kgusarov.integration.spring.netty.onconnect.handlers;
+package org.kgusarov.integration.spring.netty.onconnect;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -13,15 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.lang.reflect.Method;
 
 @NettyController
-public class OnConnectController {
-    public static final Method ON_CONNECT1;
-    public static final Method ON_CONNECT2;
+class OnConnectController {
+    static final Method ON_CONNECT1;
+    static final Method ON_CONNECT2;
 
     static {
         try {
             ON_CONNECT1 = OnConnectController.class.getDeclaredMethod("onConnect1",
                     ChannelHandlerContext.class, Channel.class);
-            ON_CONNECT2 = OnConnectController.class.getDeclaredMethod("onConnect2");
+            ON_CONNECT2 = OnConnectController.class.getDeclaredMethod("onConnect2", ChannelHandlerContext.class);
         } catch (final NoSuchMethodException ignored) {
             throw new IllegalStateException();
         }
@@ -47,7 +47,7 @@ public class OnConnectController {
 
     @SuppressWarnings("WeakerAccess")
     @NettyOnConnect(serverName = "server1", priority = 2)
-    ByteBuf onConnect2() {
+    ByteBuf onConnect2(final ChannelHandlerContext ignored) {
         calls.add(ON_CONNECT2);
         counter.arrive();
         return Unpooled.copyLong(106L);

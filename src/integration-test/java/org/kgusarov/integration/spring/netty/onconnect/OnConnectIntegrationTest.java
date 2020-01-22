@@ -9,7 +9,6 @@ import org.kgusarov.integration.spring.netty.configuration.NettyServers;
 import org.kgusarov.integration.spring.netty.etc.ClientHandler;
 import org.kgusarov.integration.spring.netty.etc.ProcessingCounter;
 import org.kgusarov.integration.spring.netty.etc.HandlerMethodCalls;
-import org.kgusarov.integration.spring.netty.onconnect.handlers.OnConnectController;
 import org.kgusarov.integration.spring.netty.onconnect.handlers.TransactionalOnConnectController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootContextLoader;
@@ -52,7 +51,6 @@ public class OnConnectIntegrationTest {
 
     @Test
     @DirtiesContext
-    @SuppressWarnings("unchecked")
     public void testHandlersAddedInCorrectOrder() throws Exception {
         final SettableFuture<Long> r1 = SettableFuture.create();
         final SettableFuture<Long> r2 = SettableFuture.create();
