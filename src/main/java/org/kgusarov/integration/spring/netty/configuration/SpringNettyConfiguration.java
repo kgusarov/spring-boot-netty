@@ -334,9 +334,6 @@ public class SpringNettyConfiguration {
             final List<NettyOnConnectParameterResolver> resolvers = buildMethodParameterResolvers(method, connectParameterResolvers);
             final Class<?> returnType = method.getReturnType();
             final boolean sendInvocationResultBack = !void.class.equals(returnType);
-
-            ReflectionUtils.makeAccessible(method);
-
             final Class<?> declaringClass = method.getDeclaringClass();
             final Object bean = beanFactory.getBean(declaringClass);
             final OnConnectMethodInvoker invoker = new OnConnectMethodInvoker(bean, method, resolvers, sendInvocationResultBack);
