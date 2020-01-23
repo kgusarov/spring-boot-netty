@@ -4,6 +4,10 @@
 [![Coverage](https://codecov.io/gh/kgusarov/spring-boot-netty/branch/master/graph/badge.svg)](https://codecov.io/gh/kgusarov/spring-boot-netty)
 [![Maven Central](https://img.shields.io/maven-central/v/org.kgusarov/spring-boot-netty.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.kgusarov%22%20AND%20a:%22spring-boot-netty%22)
 
+## Latest Release Highlights
+* [Method Handles](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/invoke/MethodHandle.html) are now used to invoke handler methods.
+* Updated [Netty](https://netty.io/) version
+
 ## Motivation
 Both [Spring Boot](https://spring.io/projects/spring-boot) and [Netty](https://netty.io/) are 
 awesome projects! So, why not use them together? Imagine, how cool it would be, if you were
